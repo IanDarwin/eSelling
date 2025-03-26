@@ -18,7 +18,7 @@ public class LoginService {
 
     public boolean verify(String username, String passwd) {
         List<User> ret =
-                em.createQuery("from User where name = ? and password = ?")
+                em.createQuery("from User where name = ?1 and passwordHash = ?2")
                         .setParameter(1, username)
                         .setParameter(2, hash(passwd))
                         .getResultList();
@@ -26,9 +26,10 @@ public class LoginService {
     }
 
     @Transactional
-    public void createUser(String username, String password) {
+    public User createUser(String username, String password) {
         User user = new User(0, username, hash(password));
         em.persist(user);
+        return user;
     }
 
     @Transactional

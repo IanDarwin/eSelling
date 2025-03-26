@@ -25,7 +25,8 @@ import static com.darwinsys.eselling.model.Constants.sellSites;
 @SuppressWarnings("unused") // It really is used!
 public class ESalesView extends VerticalLayout {
 
-    @Inject ItemService service;
+    @Inject ItemService itemService;
+    @Inject LoginService loginService;
     private boolean isLoggedIn = false;
     private String loggedInUser = "";
     private final Grid<Item> grid = new Grid<>(Item.class);
@@ -41,6 +42,7 @@ public class ESalesView extends VerticalLayout {
     private List<TextField> tfs;
 
     public ESalesView() {
+
         if (!isLoggedIn) {
             showLoginDialog();
         } else {
@@ -56,15 +58,14 @@ public class ESalesView extends VerticalLayout {
             String username = usernameField.getValue();
             String passwordClear = passwordField.getValue();
             if (username != null && !username.trim().isEmpty() &&
-                username.equals("ian") &&
                 passwordClear != null && !passwordClear.trim().isEmpty() &&
-                passwordClear.equals("secret")) {
+                loginService.verify(username, passwordClear)) {
                 isLoggedIn = true;
                 loggedInUser = username;
                 dialog.close();
                 initializeView();
             } else {
-				Notification.show("Please enter a username");
+				Notification.show("Please enter a valid username and password");
             }
         });
 
@@ -177,18 +178,18 @@ public class ESalesView extends VerticalLayout {
             selectedItem.setCondition(comboBox.getValue());
             selectedItem.setAskingPrice(askPrice);
             selectedItem.setSoldPrice(soldPrice);
-            service.updateItem(selectedItem);
+            itemService.updateItem(selectedItem);
         } else { // Create a new item
             Item newItem = new Item(0L, name, description, urls,
                     askPrice, soldPrice);
             newItem.setCondition(Condition.getDefault());
             items.add(newItem);
             grid.setItems(items);
-            service.createItem(newItem);// Refresh the grid
+            itemService.createItem(newItem);// Refresh the grid
         }
     }
 
     private List<Item> getItems() {
-        return service.getItems();
+        return itemService.getItems();
     }
 }
