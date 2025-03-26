@@ -1,0 +1,25 @@
+= eSelling Project
+
+This Vaadin-Quarkus-based project tracks personal items that I am trying to sell.
+
+It began life as a collision between a Gemini-built main View
+and the canonical Vaadin/Quarkus starter app.
+
+Run using `mvn` or `mvn quarkus:dev`
+
+Open http://localhost:8080/[] in browser.
+
+To run locally in production mode, call `mvn package -Pproduction` 
+and then
+`java -jar target/quarkus-app/quarkus-run.jar`
+
+== TODO
+
+Add fields:
+	Category?
+	Photos!?
+
+=== Longer-term:
+
+	Add ability to list items from the app's data via REST.
+
