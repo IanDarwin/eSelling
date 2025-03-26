@@ -13,6 +13,12 @@ To run locally in production mode, call `mvn package -Pproduction`
 and then
 `java -jar target/quarkus-app/quarkus-run.jar`
 
+To create a user manually:
+	echo -n 'mysecretpassword1234' | md5 # or md5sum
+	psql
+		insert into Users(id, username, passwordhash) values(0, 'username', '<result-of-hash>');
+		^D
+
 == TODO
 
 Clean up error handling
