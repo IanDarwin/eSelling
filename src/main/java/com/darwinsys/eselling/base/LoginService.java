@@ -6,12 +6,9 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import static com.darwinsys.security.DigestUtils.md5;
-import static java.util.Objects.hash;
 
 @ApplicationScoped
 public class LoginService {
@@ -30,7 +27,7 @@ public class LoginService {
 
     @Transactional
     public void createUser(String username, String password) {
-        User user = new User(username, hash(password));
+        User user = new User(0, username, hash(password));
         em.persist(user);
     }
 
