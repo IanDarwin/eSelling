@@ -93,9 +93,9 @@ public class ESalesView extends VerticalLayout {
 
         items = getItems();
         grid.setItems(items); // Use the stored items list
-        grid.setColumns("name", "description", "askingPrice", "soldPrice");
+        grid.setColumns("name", "description", "condition", "askingPrice");
         grid.getColumnByKey("name").setHeader("Item Name");
-        grid.getColumnByKey("askingPrice").setHeader("Ask Price");
+        grid.getColumnByKey("askingPrice").setHeader("Asking Price");
 
         grid.addItemDoubleClickListener(event -> { // Add double click listener
             selectedItem = event.getItem();
