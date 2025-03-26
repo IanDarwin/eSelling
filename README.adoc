@@ -13,7 +13,18 @@ To run locally in production mode, call `mvn package -Pproduction`
 and then
 `java -jar target/quarkus-app/quarkus-run.jar`
 
+== Database
+
+You need to create a file called .env (which is gitignored) in the root,
+containing the properies needed in the application.properties.
+
+The current version is set up for PostgreSQL.  If you use a different
+db, you'll have to change the module in the pom file, and in the application.properties.
+
+To create the database tables, run the commands in sql/setup.sql
+
 To create a user manually:
+
 	echo -n 'mysecretpassword1234' | md5 # or md5sum
 	psql
 		insert into Users(id, username, passwordhash) values(0, 'username', '<result-of-hash>');
