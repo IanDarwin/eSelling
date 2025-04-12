@@ -5,9 +5,9 @@ This Vaadin-Quarkus-based project tracks personal items that I am trying to sell
 It began life as a collision between a Gemini-built main View
 and the canonical Vaadin/Quarkus starter app.
 
-Run using `mvn` or `mvn quarkus:dev`
+There is no main() method; run using `mvn` or `mvn quarkus:dev`
 
-Open http://localhost:8080/[] in browser.
+Then open http://localhost:8080/[] in browser.
 
 To run locally in production mode, call `mvn package -Pproduction` 
 and then
@@ -16,10 +16,10 @@ and then
 == Database
 
 You need to create a file called .env (which is gitignored) in the root,
-containing the properies needed in the application.properties.
+containing the properties needed in the application.properties.
 
-The current version is set up for PostgreSQL.  If you use a different
-db, you'll have to change the module in the pom file, and in the application.properties.
+The current version is set up for PostgreSQL.  If you use a different db,
+you'll have to change the module in the pom file, and in the application.properties.
 
 To create the database tables, run the commands in sql/setup.sql
 
@@ -37,9 +37,10 @@ Clean up error handling
 Add fields:
 	Category?
 	Condition qualification
+	Quantity
 	Photos!?
 
 === Longer-term:
 
-	Add ability to list items from the app's data via REST.
+	Add ability to list items from the app's data out to eBay, Amazon, Kijiji, etc. via REST.
 
