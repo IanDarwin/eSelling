@@ -3,6 +3,7 @@ package com.darwinsys.eselling.model;
 import jakarta.persistence.*;
 import org.wildfly.common.annotation.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.darwinsys.eselling.model.Constants.Condition;
@@ -14,13 +15,19 @@ public class Item {
 
 	@NotNull
 	private String name = "";
+
 	@NotNull
+	@Column(length = 4096)
 	private String description = "";
 	@Enumerated(EnumType.STRING)
 	private Condition condition;
 	List<String> urls;
 	private Double askingPrice = 0d;
 	private Double soldPrice = 0d;
+	String category;
+    String conditionQualification;
+    int quantity = 1;
+    List<String> photos;
 
 	@SuppressWarnings("unused") // JPA
 	private Long getId() {
@@ -87,4 +94,37 @@ public class Item {
 	public void setUrls(List<String> urls) {
 		this.urls = urls;
     }
+
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
+	}
+
+	public String getConditionQualification() {
+		return conditionQualification;
+	}
+
+	public void setConditionQualification(String conditionQualification) {
+		this.conditionQualification = conditionQualification;
+	}
+
+	public int getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
+	}
+
+	public List<String> getPhotos() {
+		return photos;
+	}
+
+	public void setPhotos(List<String> photos) {
+		this.photos = photos;
+	}
+
 }

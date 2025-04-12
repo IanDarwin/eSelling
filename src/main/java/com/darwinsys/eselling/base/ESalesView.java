@@ -35,8 +35,7 @@ public class ESalesView extends VerticalLayout {
     private final TextArea descriptionField = new TextArea("Description");
     private final NumberField askPriceField = new NumberField("Asking Price");
     private final NumberField soldPriceField = new NumberField("Sold Price");
-    private final ComboBox<Condition> comboBox =
-            new ComboBox<>("Condition:");
+    private final ComboBox<Condition> comboBox = new ComboBox<>("Condition:");
     private Item selectedItem;
     private List<Item> items;
     private List<TextField> tfs;

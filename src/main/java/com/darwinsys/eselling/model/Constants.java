@@ -7,7 +7,7 @@ public class Constants {
             "eBay",
             "FB Market",
             "Kijiji",
-            "FreeCycle",
+            "Other",
     };
 
     public enum Condition {
