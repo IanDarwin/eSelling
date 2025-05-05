@@ -15,7 +15,7 @@ public class ItemService {
     EntityManager em;
 
     public List<Item> getItems() {
-        return em.createQuery("from Item order by name", Item.class).getResultList();
+        return em.createQuery("SELECT i from Item i where active is true order by name", Item.class).getResultList();
     }
 
     @Transactional

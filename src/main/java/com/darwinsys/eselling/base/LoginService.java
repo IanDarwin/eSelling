@@ -16,12 +16,15 @@ public class LoginService {
     @Inject
     EntityManager em;
 
-    public boolean verify(String username, String passwd) {
+    public boolean verify(String username, String passwdClear) {
         List<User> ret =
-                em.createQuery("from User where name = ?1 and passwordHash = ?2")
+                em.createQuery("from User where name = ?1 and passwordHashed = ?2", User.class)
                         .setParameter(1, username)
-                        .setParameter(2, hash(passwd))
+                        .setParameter(2, hash(passwdClear))
                         .getResultList();
+        if (ret.size() > 1) {
+            throw new IllegalStateException("Multiple accounts with same name!");
+        }
         return 1 == ret.size();
     }
 
@@ -33,8 +36,7 @@ public class LoginService {
     }
 
     @Transactional
-    public void updateItem(User user) {
-        user = user.withPassword(user.passwordHash());
+    public void updateUser(User user) {
         user = em.merge(user);
         em.persist(user);
     }

@@ -19,6 +19,7 @@ public class Item {
 	@NotNull
 	@Column(length = 4096)
 	private String description = "";
+	private boolean active = true;
 	@Enumerated(EnumType.STRING)
 	private Condition condition;
 	List<String> urls;

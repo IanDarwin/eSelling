@@ -21,5 +21,5 @@ create table users (
 	id int8 primary key,
 	name varchar,
 	password varchar,
-	passwordhash varchar,
+	passwordhashed varchar,
 );

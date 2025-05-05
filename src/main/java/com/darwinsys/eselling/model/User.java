@@ -11,23 +11,23 @@ import static com.darwinsys.security.DigestUtils.md5;
 public class User {
     @Id long id;
     String name;
-    String passwordHash;
+    String passwordHashed;
 
     public User() {
         // Needed by JPA
     }
 
-    public User(String name, String passwordHash) {
-        this(0L, name, passwordHash);
+    public User(String name, String passwordHashed) {
+        this(0L, name, passwordHashed);
     }
 
-    public User(long id, String name, String passwordHash) {
+    public User(long id, String name, String passwordHashed) {
         this.id = id;
         this.name = name;
-        this.passwordHash = passwordHash;
+        this.passwordHashed = passwordHashed;
     }
 
-    public User withPassword(String s) {
+    public User withClearPassword(String s) {
         return new User(id, name, md5(s));
     }
 }
