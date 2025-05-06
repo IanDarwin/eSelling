@@ -1,7 +1,9 @@
 package com.darwinsys.eselling.base;
 
 import com.darwinsys.eselling.model.Item;
+import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -36,9 +38,10 @@ public class ESalesView extends VerticalLayout {
     private final NumberField askPriceField = new NumberField("Asking Price");
     private final NumberField soldPriceField = new NumberField("Sold Price");
     private final ComboBox<Condition> comboBox = new ComboBox<>("Condition:");
+    Checkbox active = new Checkbox("Active?");
     private Item selectedItem;
     private List<Item> items;
-    private List<TextField> tfs;
+    private List<TextField> urlFields;
 
     public ESalesView() {
 
@@ -83,9 +86,9 @@ public class ESalesView extends VerticalLayout {
         setSizeFull();
         grid.setSizeFull();
 
-        tfs = new ArrayList<>();
+        urlFields = new ArrayList<>();
         for (var s : sellSites) {
-            tfs.add(new TextField(s + " URL"));
+            urlFields.add(new TextField(s + " URL"));
         }
 
         comboBox.setItems(Condition.values());
@@ -111,23 +114,31 @@ public class ESalesView extends VerticalLayout {
         if (selectedItem != null) {
             nameField.setValue(selectedItem.getName());
             descriptionField.setValue(selectedItem.getDescription());
-            for (int i = 0; i < tfs.size(); i++) {
-                tfs.get(i).setValue(selectedItem.getUrls().get(i));
+            for (int i = 0; i < urlFields.size(); i++) {
+                String value = selectedItem.getUrls().get(i);
+                urlFields.get(i).setValue(value);
             }
             comboBox.setValue(selectedItem.getCondition());
             askPriceField.setValue(selectedItem.getAskingPrice());
             soldPriceField.setValue(selectedItem.getSoldPrice());
+            active.setValue(selectedItem.getActive());
         } else {
             // Clear fields from previous use if creating a new item
             nameField.clear();
             descriptionField.clear();
-            for (var tf : tfs) {
-                tf.clear();
+            for (var tf : urlFields) {
+                tf.setValue("");
             }
             comboBox.setValue(Condition.getDefault());
             askPriceField.clear();
             soldPriceField.clear();
+            active.setValue(true);
         }
+
+        active.addClickListener(evt -> {
+            selectedItem.setActive(active.getValue());
+        });
+
         Button saveButton = new Button("Save", event -> {
             saveItem();
             dialog.close();
@@ -140,10 +151,16 @@ public class ESalesView extends VerticalLayout {
         });
 
         formLayout.add(nameField, descriptionField);
-        for (TextField tf : tfs) {
+        for (TextField tf : urlFields) {
             formLayout.add(tf);
         }
-        formLayout.add(comboBox, askPriceField, soldPriceField, saveButton, cancelButton);
+
+        formLayout.add(comboBox, askPriceField, soldPriceField);
+		formLayout.add(active);
+        if (formLayout.getChildren().toList().size() % 2 == 1) {
+            formLayout.add(new TextField(""));
+        }
+        formLayout.add(saveButton, cancelButton);
         dialog.add(formLayout);
         dialog.open();
     }
@@ -166,7 +183,7 @@ public class ESalesView extends VerticalLayout {
         }
         Double soldPrice = soldPriceField.getValue();
         List<String> urls = new ArrayList<>();
-        for (var tf : tfs) {
+        for (var tf : urlFields) {
             urls.add(tf.getValue());
         }
 
