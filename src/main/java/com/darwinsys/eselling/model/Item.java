@@ -128,4 +128,10 @@ public class Item {
 		this.photos = photos;
 	}
 
+    public Boolean getActive() {
+		return active;
+    }
+	public void setActive(Boolean active) {
+		this.active = active;
+	}
 }
