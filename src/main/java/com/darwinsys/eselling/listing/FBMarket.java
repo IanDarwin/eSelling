@@ -25,11 +25,11 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
 
 	public static String list(Item item) throws IOException {
 
-        // Creating Workbook instances
-        Workbook wb = new HSSFWorkbook();
+		// XXX Should be parameterized, and last part sequenced/randomized
+		var fileName = "/home/ian/eSelling/fbmarket.xlsx";
 
-		// XXX Should be parameterized, and last part sequenced/random
-        var fileName = "/home/ian/eSelling/fbmarket.xlsx";
+		// Creating Workbook instances
+        Workbook wb = new HSSFWorkbook();
 
         OutputStream fileOut = new FileOutputStream(fileName);
 
@@ -57,10 +57,11 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
 		cell = row.createCell(4);
 		cell.setCellValue("CATEGORY");
 
-		// Now a row from an Item
+		// Now a row from an Item:
+
 		// Field order (0-origin): Title, Price, Condition, Description, Category
 		row = sheet.createRow(1);
-		
+
 		cell = row.createCell(0);
 		cell.setCellValue(item.getName());
 
