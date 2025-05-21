@@ -112,9 +112,10 @@ public class ESalesView extends VerticalLayout {
         items = getItems();
         grid.setItems(items); // Use the stored items list
         grid.setSelectionMode(Grid.SelectionMode.MULTI);
-        grid.setColumns("name", "description", "condition", "askingPrice");
+        grid.setColumns("name", "description", "condition", "askingPrice", "listed");
         grid.getColumnByKey("name").setHeader("Item Name");
         grid.getColumnByKey("askingPrice").setHeader("Asking Price");
+        grid.getColumnByKey("listed").setHeader("Listed(any)?");
 
         grid.addItemDoubleClickListener(event -> { // Add double click listener
             selectedItem = event.getItem();
@@ -185,7 +186,7 @@ public class ESalesView extends VerticalLayout {
         var dialog = new Dialog();
         dialog.setHeaderTitle(title);
         dialog.add(message);
-        Button OKButton = new Button("Cancel", e -> dialog.close());
+        Button OKButton = new Button("OK", e -> dialog.close());
         dialog.getFooter().add(OKButton);
         dialog.open();
     }

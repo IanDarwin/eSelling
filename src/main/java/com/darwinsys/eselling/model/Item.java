@@ -54,6 +54,18 @@ public class Item {
 	public Item() {
 	}
 
+	public boolean isListed() {
+		for (String url : urls) {
+			if (url != null && !url.isEmpty()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	public void setListed(boolean useless) {
+		throw new UnsupportedOperationException("isListed is a derived value");
+	}
+
 	public String getName() {
 		return name;
 	}
