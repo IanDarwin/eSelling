@@ -1,6 +1,8 @@
 package com.darwinsys.eselling.listing;
 
 import java.io.*;
+import java.util.List;
+import java.util.Set;
 
 import com.darwinsys.eselling.model.Constants;
 import com.darwinsys.eselling.model.Item;
@@ -19,11 +21,11 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
 		item.setAskingPrice(42d);
 		item.setCondition(Constants.Condition.USED);
 
-		String fname = FBMarket.list(item);
+		String fname = FBMarket.list(Set.of(item));
 		System.out.println("FBMarket Upload is at " + fname);
 	}
 
-	public static String list(Item item) throws IOException {
+	public static String list(Set<Item> items) throws IOException {
 
 		// XXX Should be parameterized, and last part sequenced/randomized
 		var fileName = "/home/ian/eSelling/fbmarket.xlsx";
@@ -57,28 +59,31 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
 		cell = row.createCell(4);
 		cell.setCellValue("CATEGORY");
 
-		// Now a row from an Item:
+		// Now a row from each Item:
+		int rowNum = 1;
 
-		// Field order (0-origin): Title, Price, Condition, Description, Category
-		row = sheet.createRow(1);
+		for (Item item : items) {
+			// Field order (0-origin): Title, Price, Condition, Description, Category
+			row = sheet.createRow(rowNum++);
 
-		cell = row.createCell(0);
-		cell.setCellValue(item.getName());
+			cell = row.createCell(0);
+			cell.setCellValue(item.getName());
 
-		cell = row.createCell(1);
-		cell.setCellValue(item.getAskingPrice().intValue());
+			cell = row.createCell(1);
+			cell.setCellValue(item.getAskingPrice().intValue());
 
-		cell = row.createCell(2);
-		cell.setCellValue("Used - Good");
+			cell = row.createCell(2);
+			cell.setCellValue("Used - Good");
 
-		cell = row.createCell(3);
-		cell.setCellValue(item.getDescription());
+			cell = row.createCell(3);
+			cell.setCellValue(item.getDescription());
 
-		cell = row.createCell(4);
-		cell.setCellValue("Category");
+			cell = row.createCell(4);
+			cell.setCellValue("Category");
+		}
 
 		wb.write(fileOut);
-
+		System.out.printf("Wrote %d items into %s\n", items.size(), fileName);
 		return fileName;
 	}
 }

@@ -1,11 +1,13 @@
 package com.darwinsys.eselling.base;
 
+import com.darwinsys.eselling.listing.FBMarket;
 import com.darwinsys.eselling.model.Item;
 import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.*;
@@ -16,6 +18,7 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import jakarta.inject.Inject;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -79,10 +82,22 @@ public class ESalesView extends VerticalLayout {
 
     private void initializeView() {
         removeAll();
-        H1 header = new H1("E-Sales Items - Logged in as: " + loggedInUser);
+        H1 header = new H1("E-Sales Items - Logged in as " + loggedInUser);
         Button addButton = new Button("Add Item");
         addButton.addClickListener(event1 -> showItemDialog());
-        add(header, grid, addButton); // Add the button
+        Button listFBButton = new Button("List Selected on FB");
+        listFBButton.addClickListener(event1 -> {
+            try {
+                final String fileName = FBMarket.list(grid.getSelectedItems());
+                showMessageDialog("Saved", "Now upload " + fileName +
+                        " to https://www.facebook.com/marketplace/create/bulk");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        var bottomRow = new HorizontalLayout();
+        bottomRow.add(addButton, listFBButton);
+        add(header, grid, bottomRow); // Add the button
         setSizeFull();
         grid.setSizeFull();
 
@@ -96,6 +111,7 @@ public class ESalesView extends VerticalLayout {
 
         items = getItems();
         grid.setItems(items); // Use the stored items list
+        grid.setSelectionMode(Grid.SelectionMode.MULTI);
         grid.setColumns("name", "description", "condition", "askingPrice");
         grid.getColumnByKey("name").setHeader("Item Name");
         grid.getColumnByKey("askingPrice").setHeader("Asking Price");
@@ -162,6 +178,15 @@ public class ESalesView extends VerticalLayout {
         }
         formLayout.add(saveButton, cancelButton);
         dialog.add(formLayout);
+        dialog.open();
+    }
+
+    void showMessageDialog(String title, String message) {
+        var dialog = new Dialog();
+        dialog.setHeaderTitle(title);
+        dialog.add(message);
+        Button OKButton = new Button("Cancel", e -> dialog.close());
+        dialog.getFooter().add(OKButton);
         dialog.open();
     }
 
