@@ -1,15 +1,18 @@
 package com.darwinsys.eselling.listing;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import com.darwinsys.eselling.model.Constants;
 import com.darwinsys.eselling.model.Item;
+import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 
-public class FBMarket {
+@ApplicationScoped
+public class FBMarket implements Market<Item> {
 
 	// Main driver method
 	public static void main(String[] args) throws IOException {
@@ -21,11 +24,12 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
 		item.setAskingPrice(42d);
 		item.setCondition(Constants.Condition.USED);
 
-		String fname = FBMarket.list(Set.of(item));
-		System.out.println("FBMarket Upload is at " + fname);
+		var ret = new FBMarket().list(Set.of(item));
+		System.out.println("FBMarket Upload is at " + ret.location());
+		System.out.printf("ret contains = %d warnings\n", ret.warnings().size());
 	}
 
-	public static String list(Set<Item> items) throws IOException {
+	public ListResponse list(Set<Item> items) {
 
 		// XXX Should be parameterized, and last part sequenced/randomized
 		var fileName = "/home/ian/eSelling/fbmarket.xlsx";
@@ -33,57 +37,67 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
 		// Creating Workbook instances
 		Workbook wb = new HSSFWorkbook();
 
-		OutputStream fileOut = new FileOutputStream(fileName);
+		List<String> warnings = new ArrayList<>();
 
-		// Creating a Sheet from the workbench
-		Sheet sheet = wb.createSheet("Listing");
+		try (OutputStream fileOut = new FileOutputStream(fileName)) {
 
-		// A cell must be created from a specific row
+			// Creating a Sheet from the workbench
+			Sheet sheet = wb.createSheet("Listing");
 
-		Cell cell;
-		Row row = sheet.createRow(0);
+			Row row = sheet.createRow(0);
 
-		// FB seemed to prefer titles in SCREAMING CAPS (as per template.xslt at least).
-		cell = row.createCell(0);
-		cell.setCellValue("TITLE");
-
-		cell = row.createCell(1);
-		cell.setCellValue("PRICE");
-
-		cell = row.createCell(2);
-		cell.setCellValue("CONDITION");
-
-		cell = row.createCell(3);
-		cell.setCellValue("DESCRIPTION");
-
-		cell = row.createCell(4);
-		cell.setCellValue("CATEGORY");
-
-		// Now a row from each Item:
-		int rowNum = 1;
-
-		for (Item item : items) {
-			// Field order (0-origin): Title, Price, Condition, Description, Category
-			row = sheet.createRow(rowNum++);
+			// A cell must be created from a specific row
+			Cell cell;
 
 			cell = row.createCell(0);
-			cell.setCellValue(item.getName());
+			cell.setCellValue("TITLE");
 
 			cell = row.createCell(1);
-			cell.setCellValue(item.getAskingPrice().intValue());
+			cell.setCellValue("PRICE");
 
 			cell = row.createCell(2);
-			cell.setCellValue("Used - Good");
+			cell.setCellValue("CONDITION");
 
 			cell = row.createCell(3);
-			cell.setCellValue(item.getDescription());
+			cell.setCellValue("DESCRIPTION");
 
 			cell = row.createCell(4);
-			cell.setCellValue("Category");
-		}
+			cell.setCellValue("CATEGORY");
 
-		wb.write(fileOut);
-		System.out.printf("Wrote %d items into %s\n", items.size(), fileName);
-		return fileName;
+			// Now a row from each Item:
+			int rowNum = 0;
+
+			for (Item item : items) {
+				String fbURL = item.getUrls().get(2);
+
+				if (fbURL != null && !fbURL.isEmpty()) {
+					warnings.add(String.format("%s is already listed as %s, skipping", item.getName(), fbURL));
+					continue;
+				}
+				// Field order (0-origin): Title, Price, Condition, Description, Category
+				row = sheet.createRow(++rowNum);
+
+				cell = row.createCell(0);
+				cell.setCellValue(item.getName());
+
+				cell = row.createCell(1);
+				cell.setCellValue(item.getAskingPrice().intValue());
+
+				cell = row.createCell(2);
+				cell.setCellValue("Used - Good");
+
+				cell = row.createCell(3);
+				cell.setCellValue(item.getDescription());
+
+				cell = row.createCell(4);
+				cell.setCellValue("Category");
+			}
+
+			wb.write(fileOut);
+			System.out.printf("Wrote %d items into %s\n", items.size(), fileName);
+			return new ListResponse(fileName, rowNum, warnings);
+		} catch (IOException ex) {
+			throw new RuntimeException("IO Error: " + ex, ex);
+		}
 	}
 }

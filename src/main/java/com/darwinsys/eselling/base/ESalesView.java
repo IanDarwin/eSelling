@@ -1,8 +1,8 @@
 package com.darwinsys.eselling.base;
 
 import com.darwinsys.eselling.listing.FBMarket;
+import com.darwinsys.eselling.listing.ListResponse;
 import com.darwinsys.eselling.model.Item;
-import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -18,7 +18,6 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import jakarta.inject.Inject;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -32,6 +31,7 @@ public class ESalesView extends VerticalLayout {
 
     @Inject ItemService itemService;
     @Inject LoginService loginService;
+    @Inject FBMarket fbMarket;
     private boolean isLoggedIn = false;
     private String loggedInUser = "";
     private final Grid<Item> grid = new Grid<>(Item.class);
@@ -87,13 +87,11 @@ public class ESalesView extends VerticalLayout {
         addButton.addClickListener(event1 -> showItemDialog());
         Button listFBButton = new Button("List Selected on FB");
         listFBButton.addClickListener(event1 -> {
-            try {
-                final String fileName = FBMarket.list(grid.getSelectedItems());
-                showMessageDialog("Saved", "Now upload " + fileName +
-                        " to https://www.facebook.com/marketplace/create/bulk");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+                final ListResponse resp = fbMarket.list(grid.getSelectedItems());
+                showMessageDialog("Saved", String.format("""
+                        Saved  %d Items to %s with %d warnings; now upload
+                        to https://www.facebook.com/marketplace/create/bulk""",
+                        Integer.valueOf(resp.successCount()), resp.location(), resp.warnings().size()));
         });
         var bottomRow = new HorizontalLayout();
         bottomRow.add(addButton, listFBButton);
@@ -152,9 +150,8 @@ public class ESalesView extends VerticalLayout {
             active.setValue(true);
         }
 
-        active.addClickListener(evt -> {
-            selectedItem.setActive(active.getValue());
-        });
+        active.addClickListener(
+                evt -> selectedItem.setActive(active.getValue()));
 
         Button saveButton = new Button("Save", event -> {
             saveItem();
