@@ -9,8 +9,8 @@ import org.apache.poi.ss.usermodel.*;
 
 public class FBMarket {
 
-    // Main driver method
-    public static void main(String[] args) throws IOException {
+	// Main driver method
+	public static void main(String[] args) throws IOException {
 
 		Item item = new Item();
 		item.setName("Thing for sale");
@@ -29,19 +29,19 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
 		var fileName = "/home/ian/eSelling/fbmarket.xlsx";
 
 		// Creating Workbook instances
-        Workbook wb = new HSSFWorkbook();
+		Workbook wb = new HSSFWorkbook();
 
-        OutputStream fileOut = new FileOutputStream(fileName);
+		OutputStream fileOut = new FileOutputStream(fileName);
 
-        // Creating a Sheet from the workbench
-        Sheet sheet = wb.createSheet("Listing");
+		// Creating a Sheet from the workbench
+		Sheet sheet = wb.createSheet("Listing");
 
 		// A cell must be created from a specific row
 
 		Cell cell;
 		Row row = sheet.createRow(0);
 
-		// FB wants titles in SCREAMING CAPS
+		// FB seemed to prefer titles in SCREAMING CAPS (as per template.xslt at least).
 		cell = row.createCell(0);
 		cell.setCellValue("TITLE");
 
