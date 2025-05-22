@@ -57,7 +57,7 @@ public class FBMarket implements Market<Item> {
 				String fbURL = item.getUrl(MarketName.FBMarket);
 
 				if (fbURL != null && !fbURL.isEmpty()) {
-					warnings.add(String.format("%s is already listed as %s, skipping", item.getName(), fbURL));
+					warnings.add(String.format("`%s' is already listed as %s, skipping", item.getName(), fbURL));
 					continue;
 				}
 				// Field order (0-origin): Title, Price, Condition, Description, Category

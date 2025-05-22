@@ -100,9 +100,11 @@ public class ESalesView extends VerticalLayout {
             for (String s : resp.warnings()) {
                 sb.append("; ").append(s);
             }
-            sb.append(". Now upload ").append(resp.location())
-                    .append(" to ")
-                    .append("to https://www.facebook.com/marketplace/create/bulk");
+            if (resp.successCount() > 0) {
+                sb.append(". Now upload ").append(resp.location())
+                        .append(" to ")
+                        .append("to https://www.facebook.com/marketplace/create/bulk");
+            }
             showMessageDialog("Saved",  sb.toString());
         });
         var bottomRow = new HorizontalLayout();
