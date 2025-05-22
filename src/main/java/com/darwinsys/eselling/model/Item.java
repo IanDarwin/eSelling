@@ -1,5 +1,6 @@
 package com.darwinsys.eselling.model;
 
+import com.darwinsys.eselling.listing.MarketName;
 import jakarta.persistence.*;
 import org.wildfly.common.annotation.NotNull;
 
@@ -22,7 +23,7 @@ public class Item {
 	private boolean active = true;
 	@Enumerated(EnumType.STRING)
 	private Condition condition;
-	List<String> urls;
+	List<String> urls = new ArrayList<>();
 	private Double askingPrice = 0d;
 	private Double soldPrice = 0d;
 	String category;
@@ -52,8 +53,24 @@ public class Item {
 
 	@SuppressWarnings("unused") // JPA
 	public Item() {
+		for (int i = 0; i < 5; i++) {
+			urls.add("");
+		}
 	}
 
+	@Transient
+	public String getUrl(MarketName market) {
+		int i = market.ordinal();
+		if (i > urls.size() - 1) {
+			throw new IndexOutOfBoundsException();
+		}
+		return urls.get(i);
+	}
+	public void setUrl(MarketName market, String url) {
+		urls.set(market.ordinal(), url);
+	}
+
+	@Transient
 	public boolean isListed() {
 		for (String url : urls) {
 			if (url != null && !url.isEmpty()) {

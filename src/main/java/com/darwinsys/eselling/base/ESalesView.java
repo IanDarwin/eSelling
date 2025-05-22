@@ -20,6 +20,7 @@ import jakarta.inject.Inject;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
 
 import static com.darwinsys.eselling.model.Constants.Condition;
 import static com.darwinsys.eselling.model.Constants.sellSites;
@@ -85,13 +86,24 @@ public class ESalesView extends VerticalLayout {
         H1 header = new H1("E-Sales Items - Logged in as " + loggedInUser);
         Button addButton = new Button("Add Item");
         addButton.addClickListener(event1 -> showItemDialog());
-        Button listFBButton = new Button("List Selected on FB");
+        Button listFBButton = new Button("Export Selected to FB");
         listFBButton.addClickListener(event1 -> {
-                final ListResponse resp = fbMarket.list(grid.getSelectedItems());
-                showMessageDialog("Saved", String.format("""
-                        Saved  %d Items to %s with %d warnings; now upload
-                        to https://www.facebook.com/marketplace/create/bulk""",
-                        Integer.valueOf(resp.successCount()), resp.location(), resp.warnings().size()));
+            final Set<Item> selectedItems = grid.getSelectedItems();
+            if (selectedItems.isEmpty()) {
+                 showMessageDialog("Correct and resubmit", "No items selected!");
+                 return;
+            }
+            final ListResponse resp = fbMarket.list(selectedItems);
+            var sb = new StringBuffer(
+                String.format("Saved %d Items with %d warnings",
+                Integer.valueOf(resp.successCount()), resp.warnings().size()));
+            for (String s : resp.warnings()) {
+                sb.append("; ").append(s);
+            }
+            sb.append(". Now upload ").append(resp.location())
+                    .append(" to ")
+                    .append("to https://www.facebook.com/marketplace/create/bulk");
+            showMessageDialog("Saved",  sb.toString());
         });
         var bottomRow = new HorizontalLayout();
         bottomRow.add(addButton, listFBButton);

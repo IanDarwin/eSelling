@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import com.darwinsys.eselling.model.Constants;
 import com.darwinsys.eselling.model.Item;
 import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -14,32 +13,19 @@ import org.apache.poi.ss.usermodel.*;
 @ApplicationScoped
 public class FBMarket implements Market<Item> {
 
-	// Main driver method
-	public static void main(String[] args) throws IOException {
+	private final boolean chatterly = false;
 
-		Item item = new Item();
-		item.setName("Thing for sale");
-		item.setDescription("""
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.""");
-		item.setAskingPrice(42d);
-		item.setCondition(Constants.Condition.USED);
-
-		var ret = new FBMarket().list(Set.of(item));
-		System.out.println("FBMarket Upload is at " + ret.location());
-		System.out.printf("ret contains = %d warnings\n", ret.warnings().size());
-	}
+	// XXX Should be parameterized, and last part sequenced/randomized?
+	public static final String location = "/home/ian/eSelling/fbmarket.xlsx";
 
 	public ListResponse list(Set<Item> items) {
-
-		// XXX Should be parameterized, and last part sequenced/randomized
-		var fileName = "/home/ian/eSelling/fbmarket.xlsx";
 
 		// Creating Workbook instances
 		Workbook wb = new HSSFWorkbook();
 
 		List<String> warnings = new ArrayList<>();
 
-		try (OutputStream fileOut = new FileOutputStream(fileName)) {
+		try (OutputStream fileOut = new FileOutputStream(location)) {
 
 			// Creating a Sheet from the workbench
 			Sheet sheet = wb.createSheet("Listing");
@@ -68,7 +54,7 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
 			int rowNum = 0;
 
 			for (Item item : items) {
-				String fbURL = item.getUrls().get(2);
+				String fbURL = item.getUrl(MarketName.FBMarket);
 
 				if (fbURL != null && !fbURL.isEmpty()) {
 					warnings.add(String.format("%s is already listed as %s, skipping", item.getName(), fbURL));
@@ -94,8 +80,13 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
 			}
 
 			wb.write(fileOut);
-			System.out.printf("Wrote %d items into %s\n", items.size(), fileName);
-			return new ListResponse(fileName, rowNum, warnings);
+			final ListResponse listResponse = new ListResponse(location, rowNum, warnings);
+			if (chatterly) {
+				System.out.printf("Wrote %d items into %s with %d warnings\n",
+						items.size(), location, warnings.size());
+				System.out.println("listResponse = " + listResponse);
+			}
+			return listResponse;
 		} catch (IOException ex) {
 			throw new RuntimeException("IO Error: " + ex, ex);
 		}

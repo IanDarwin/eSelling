@@ -8,6 +8,15 @@ public record ListResponse(String location, int successCount, List<String> warni
     public ListResponse(String location, int successCount, List<String> warnings) {
         this.location = location;
         this.successCount = successCount;
-        this.warnings = new ArrayList<String>();
+        this.warnings = warnings;
+    }
+
+    @Override
+    public String toString() {
+        return "ListResponse{" +
+                "location='" + location + '\'' +
+                ", successCount=" + successCount +
+                ", warnings=" + warnings.size() +
+                '}';
     }
 }
