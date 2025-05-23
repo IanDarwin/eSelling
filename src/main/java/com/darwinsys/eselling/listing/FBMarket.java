@@ -70,7 +70,22 @@ public class FBMarket implements Market<Item> {
 				cell.setCellValue(item.getAskingPrice().intValue());
 
 				cell = row.createCell(2);
-				cell.setCellValue("Used - Good");
+				if (item.getCondition() == null) {
+					cell.setCellValue("Used - Good"); // Best guess
+				} else {
+					switch(item.getCondition()) {
+						case NEW:
+							cell.setCellValue("New"); break;
+						case LIKE_NEW:
+							cell.setCellValue("New"); break;
+						case USED:
+							cell.setCellValue("Used - Good"); break;
+						case FOR_PARTS:
+							cell.setCellValue("Broken/Not Working"); break;
+						default:
+							break;
+					}
+				}
 
 				cell = row.createCell(3);
 				cell.setCellValue(item.getDescription());
