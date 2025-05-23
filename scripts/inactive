@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# show the inactive items; there's not yet a GUI for this
+
+psql -d eselling -c 'SELECT id,name FROM item WHERE active is false'
