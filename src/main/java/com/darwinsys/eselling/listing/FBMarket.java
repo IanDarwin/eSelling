@@ -94,7 +94,20 @@ public class FBMarket implements Market<Item> {
 				cell.setCellValue(item.getDescription());
 
 				cell = row.createCell(4);
-				cell.setCellValue("Category");
+				cell.setCellValue(switch(item.getCategory()){
+					case Antiques -> "Antiques & Collectibles";
+					case Artwork -> "Arts & Crafts";
+                    case Automotive -> "Auto Parts";
+                    case Books -> "Books, Movies & Music";
+					case Camping -> "Sports & Outdoors";
+					case ComputersElectronics-> "Electronics & computers";
+					case Furniture-> "Furniture";
+					case Household-> "Household";
+					case Photography-> "Arts & Crafts";
+					case SportingGoods-> "Sports & Outdoors";
+					case Tools -> "Tools";
+					case null -> "XX CATEGORY XX";
+				});
 			}
 
 			wb.write(fileOut);

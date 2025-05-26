@@ -42,7 +42,6 @@ public class ESalesView extends VerticalLayout {
     private final TextField nameField = new TextField("Name");
     private final TextArea descriptionField = new TextArea("Description");
     private final NumberField askPriceField = new NumberField("Asking Price");
-    private final NumberField soldPriceField = new NumberField("Sold Price");
     private final ComboBox<Condition> conditionComboBox = new ComboBox<>("Condition:");
     private final ComboBox<Category> categoryComboBox = new ComboBox<>("Category");
     Checkbox active = new Checkbox("Active?");
@@ -155,7 +154,6 @@ public class ESalesView extends VerticalLayout {
             conditionComboBox.setValue(selectedItem.getCondition());
             categoryComboBox.setValue(selectedItem.getCategory());
             askPriceField.setValue(selectedItem.getAskingPrice());
-            soldPriceField.setValue(selectedItem.getSoldPrice());
             active.setValue(selectedItem.getActive());
         } else {
             // Clear fields from previous use if creating a new item
@@ -166,7 +164,6 @@ public class ESalesView extends VerticalLayout {
             }
             conditionComboBox.setValue(Condition.getDefault());
             askPriceField.clear();
-            soldPriceField.clear();
             active.setValue(true);
         }
 
@@ -189,12 +186,12 @@ public class ESalesView extends VerticalLayout {
             formLayout.add(tf);
         }
 
-        formLayout.add(conditionComboBox, categoryComboBox, askPriceField, soldPriceField);
+        formLayout.add(askPriceField, conditionComboBox, categoryComboBox);
 		formLayout.add(active);
-        if (formLayout.getChildren().toList().size() % 2 == 1) {
-            formLayout.add(new TextField(""));
-        }
-        formLayout.add(saveButton, cancelButton);
+
+        var bottomRow = new HorizontalLayout();
+        bottomRow.add(saveButton, cancelButton);
+        formLayout.add(bottomRow);
         dialog.add(formLayout);
         dialog.open();
     }
@@ -229,7 +226,6 @@ public class ESalesView extends VerticalLayout {
             Notification.show("Asking price is required");
             return;
         }
-        Double soldPrice = soldPriceField.getValue();
         List<String> urls = new ArrayList<>();
         for (var tf : urlFields) {
             urls.add(tf.getValue());
@@ -242,11 +238,10 @@ public class ESalesView extends VerticalLayout {
             selectedItem.setCondition(conditionComboBox.getValue());
             selectedItem.setCategory(categoryComboBox.getValue());
             selectedItem.setAskingPrice(askPrice);
-            selectedItem.setSoldPrice(soldPrice);
             itemService.updateItem(selectedItem);
         } else { // Create a new item
             Item newItem = new Item(0L, name, description, urls,
-                    askPrice, soldPrice);
+                    askPrice);
             newItem.setCondition(Condition.getDefault());
             items.add(newItem);
             grid.setItems(items);

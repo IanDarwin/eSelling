@@ -25,7 +25,6 @@ public class Item {
 	private Condition condition;
 	List<String> urls = new ArrayList<>();
 	private Double askingPrice = 0d;
-	private Double soldPrice = 0d;
 	@Enumerated(EnumType.STRING)
 	Category category;
     String conditionQualification;
@@ -43,13 +42,12 @@ public class Item {
 
 	public Item(Long id, String name, String description,
 				List<String> urls,
-				Double askingPrice, Double soldPrice) {
+				Double askingPrice) {
 		this.id = id;
 		this.name = name;
 		this.description = description;
 		this.urls = urls;
 		this.askingPrice = askingPrice;
-		this.soldPrice = soldPrice;
 	}
 
 	@SuppressWarnings("unused") // JPA
@@ -110,13 +108,6 @@ public class Item {
 	}
 	public void setAskingPrice(Double askingPrice) {
 		this.askingPrice = askingPrice;
-	}
-
-	public Double getSoldPrice() {
-		return soldPrice;
-	}
-	public void setSoldPrice(Double soldPrice) {
-		this.soldPrice = soldPrice;
 	}
 
 	public List<String> getUrls() {
