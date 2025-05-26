@@ -2,6 +2,7 @@ package com.darwinsys.eselling.base;
 
 import com.darwinsys.eselling.listing.FBMarket;
 import com.darwinsys.eselling.listing.ListResponse;
+import com.darwinsys.eselling.model.Category;
 import com.darwinsys.eselling.model.Item;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -22,7 +23,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
 
-import static com.darwinsys.eselling.model.Constants.Condition;
+import com.darwinsys.eselling.model.Condition;
+
 import static com.darwinsys.eselling.model.Constants.sellSites;
 
 @Route(value = "")
@@ -41,7 +43,8 @@ public class ESalesView extends VerticalLayout {
     private final TextArea descriptionField = new TextArea("Description");
     private final NumberField askPriceField = new NumberField("Asking Price");
     private final NumberField soldPriceField = new NumberField("Sold Price");
-    private final ComboBox<Condition> comboBox = new ComboBox<>("Condition:");
+    private final ComboBox<Condition> conditionComboBox = new ComboBox<>("Condition:");
+    private final ComboBox<Category> categoryComboBox = new ComboBox<>("Category");
     Checkbox active = new Checkbox("Active?");
     private Item selectedItem;
     private List<Item> items;
@@ -118,13 +121,15 @@ public class ESalesView extends VerticalLayout {
             urlFields.add(new TextField(s + " URL"));
         }
 
-        comboBox.setItems(Condition.values());
-        comboBox.setValue(Condition.USED);
+        conditionComboBox.setItems(Condition.values());
+        conditionComboBox.setValue(Condition.USED);
+
+        categoryComboBox.setItems(Category.values()); // No default value
 
         items = getItems();
         grid.setItems(items); // Use the stored items list
         grid.setSelectionMode(Grid.SelectionMode.MULTI);
-        grid.setColumns("name", "description", "condition", "askingPrice", "listed");
+        grid.setColumns("name", "listed", "description", "condition", "askingPrice");
         grid.getColumnByKey("name").setHeader("Item Name");
         grid.getColumnByKey("askingPrice").setHeader("Asking Price");
         grid.getColumnByKey("listed").setHeader("Listed(any)?");
@@ -147,7 +152,8 @@ public class ESalesView extends VerticalLayout {
                 String value = selectedItem.getUrls().get(i);
                 urlFields.get(i).setValue(value);
             }
-            comboBox.setValue(selectedItem.getCondition());
+            conditionComboBox.setValue(selectedItem.getCondition());
+            categoryComboBox.setValue(selectedItem.getCategory());
             askPriceField.setValue(selectedItem.getAskingPrice());
             soldPriceField.setValue(selectedItem.getSoldPrice());
             active.setValue(selectedItem.getActive());
@@ -158,7 +164,7 @@ public class ESalesView extends VerticalLayout {
             for (var tf : urlFields) {
                 tf.setValue("");
             }
-            comboBox.setValue(Condition.getDefault());
+            conditionComboBox.setValue(Condition.getDefault());
             askPriceField.clear();
             soldPriceField.clear();
             active.setValue(true);
@@ -183,7 +189,7 @@ public class ESalesView extends VerticalLayout {
             formLayout.add(tf);
         }
 
-        formLayout.add(comboBox, askPriceField, soldPriceField);
+        formLayout.add(conditionComboBox, categoryComboBox, askPriceField, soldPriceField);
 		formLayout.add(active);
         if (formLayout.getChildren().toList().size() % 2 == 1) {
             formLayout.add(new TextField(""));
@@ -205,9 +211,14 @@ public class ESalesView extends VerticalLayout {
     private void saveItem() {
         String name = nameField.getValue();
         String description = descriptionField.getValue();
+        Category category = categoryComboBox.getValue();
         Double askPrice = askPriceField.getValue();
         if (name == null) {
             Notification.show("Short name is required");
+            return;
+        }
+        if (category == null) {
+            Notification.show("A Category is required");
             return;
         }
         if (description == null) {
@@ -228,7 +239,8 @@ public class ESalesView extends VerticalLayout {
             selectedItem.setName(name);
             selectedItem.setDescription(description);
             selectedItem.setUrls(urls);
-            selectedItem.setCondition(comboBox.getValue());
+            selectedItem.setCondition(conditionComboBox.getValue());
+            selectedItem.setCategory(categoryComboBox.getValue());
             selectedItem.setAskingPrice(askPrice);
             selectedItem.setSoldPrice(soldPrice);
             itemService.updateItem(selectedItem);

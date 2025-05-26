@@ -7,7 +7,7 @@ import org.wildfly.common.annotation.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.darwinsys.eselling.model.Constants.Condition;
+import com.darwinsys.eselling.model.Condition;
 
 @Entity
 public class Item {
@@ -26,7 +26,8 @@ public class Item {
 	List<String> urls = new ArrayList<>();
 	private Double askingPrice = 0d;
 	private Double soldPrice = 0d;
-	String category;
+	@Enumerated(EnumType.STRING)
+	Category category;
     String conditionQualification;
     int quantity = 1;
     List<String> photos;
@@ -125,11 +126,11 @@ public class Item {
 		this.urls = urls;
     }
 
-	public String getCategory() {
+	public Category getCategory() {
 		return category;
 	}
 
-	public void setCategory(String category) {
+	public void setCategory(Category category) {
 		this.category = category;
 	}
 
