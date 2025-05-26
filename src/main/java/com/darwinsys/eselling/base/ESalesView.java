@@ -172,6 +172,8 @@ public class ESalesView extends VerticalLayout {
 
         Button saveButton = new Button("Save", event -> {
             saveItem();
+            items = getItems();
+            grid.setItems(items);
             dialog.close();
             selectedItem = null;
         });
