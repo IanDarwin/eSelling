@@ -4,6 +4,7 @@ import com.darwinsys.eselling.listing.MarketName;
 import jakarta.persistence.*;
 import org.wildfly.common.annotation.NotNull;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,11 +51,24 @@ public class Item {
 		this.askingPrice = askingPrice;
 	}
 
+	public Item(long id, String name, String description, double price,
+				Category category,
+				Condition condition, String imageURL) {
+		this(id, name, description, null, price);
+		urls = urlsEmpty();
+	}
+
 	@SuppressWarnings("unused") // JPA
 	public Item() {
+		urls = urlsEmpty();
+	}
+
+	private List<String> urlsEmpty() {
+		List<String> urls = new ArrayList<>();
 		for (int i = 0; i < 5; i++) {
 			urls.add("");
 		}
+		return urls;
 	}
 
 	@Transient

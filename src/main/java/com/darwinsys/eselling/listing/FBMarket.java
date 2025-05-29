@@ -2,6 +2,7 @@ package com.darwinsys.eselling.listing;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -21,100 +22,124 @@ public class FBMarket implements Market<Item> {
 	// XXX Should be parameterized, and last part sequenced/randomized?
 	public static final String location = "/home/ian/eSelling/fbmarket.xlsx";
 
-	public ListResponse list(Set<Item> items) {
+	List<String> warnings;
 
-		// Creating Workbook instances
-		Workbook wb = new HSSFWorkbook();
+	Workbook wb = new HSSFWorkbook();
+	Sheet sheet;
+	int rowNum;
+	int numItems;
 
-		List<String> warnings = new ArrayList<>();
+	@Override
+	public void startStream(String location) {
+
+		warnings = new ArrayList<>();
+		numItems = rowNum = 0;
+
+		// Creating a Sheet from the workbench
+		sheet = wb.createSheet("Listing");
+
+		Row row = sheet.createRow(0);
+
+		// A cell must be created from a specific row
+		Cell cell;
+
+		cell = row.createCell(0);
+		cell.setCellValue("TITLE");
+
+		cell = row.createCell(1);
+		cell.setCellValue("PRICE");
+
+		cell = row.createCell(2);
+		cell.setCellValue("CONDITION");
+
+		cell = row.createCell(3);
+		cell.setCellValue("DESCRIPTION");
+
+		cell = row.createCell(4);
+		cell.setCellValue("CATEGORY");
+
+	}
+
+	public ListResponse list(Item item) {
+
+		// Now a row from each Item:
+		int numMessages = 0;
+
+		String fbURL = item.getUrl(MarketName.FBMarket);
+
+		if (fbURL != null && !fbURL.isEmpty()) {
+			warnings.add(String.format("`%s' is already listed as %s", item.getName(), fbURL));
+			++numMessages;
+		}
+
+		// Field order (0-origin): Title, Price, Condition, Description, Category
+		Row row = sheet.createRow(++rowNum);
+
+		Cell cell = row.createCell(0);
+		cell.setCellValue(item.getName());
+
+		cell = row.createCell(1);
+		cell.setCellValue(item.getAskingPrice().intValue());
+
+		cell = row.createCell(2);
+		if (item.getCondition() == null) {
+			cell.setCellValue("Used - Good"); // Best guess
+		} else {
+			switch (item.getCondition()) {
+				case NEW:
+					cell.setCellValue("New");
+					break;
+				case LIKE_NEW:
+					cell.setCellValue("New");
+					break;
+				case USED:
+					cell.setCellValue("Used - Good");
+					break;
+				case FOR_PARTS:
+					cell.setCellValue("Broken/Not Working");
+					break;
+				default:
+					break;
+			}
+		}
+
+		cell = row.createCell(3);
+		cell.setCellValue(item.getDescription());
+
+		cell = row.createCell(4);
+		cell.setCellValue(switch (item.getCategory()) {
+			case Antiques -> "Antiques & Collectibles";
+			case Artwork -> "Arts & Crafts";
+			case Automotive -> "Auto Parts";
+			case Books -> "Books, Movies & Music";
+			case Camping -> "Sports & Outdoors";
+			case ComputersElectronics -> "Electronics & computers";
+			case Furniture -> "Furniture";
+			case Household -> "Household";
+			case Photography -> "Arts & Crafts";
+			case SportingGoods -> "Sports & Outdoors";
+			case Tools -> "Tools";
+			case null -> "XX CATEGORY XX";
+		});
+		return new ListResponse(location, 1, warnings);
+	}
+
+	@Override
+	public ListResponse list(Collection<Item> items) {
+		var r = Market.super.list(items);
+		r.setLocation(location);
+		return r;
+	}
+
+	@Override
+	public ListResponse closeStream() {
 
 		try (OutputStream fileOut = new FileOutputStream(location)) {
-
-			// Creating a Sheet from the workbench
-			Sheet sheet = wb.createSheet("Listing");
-
-			Row row = sheet.createRow(0);
-
-			// A cell must be created from a specific row
-			Cell cell;
-
-			cell = row.createCell(0);
-			cell.setCellValue("TITLE");
-
-			cell = row.createCell(1);
-			cell.setCellValue("PRICE");
-
-			cell = row.createCell(2);
-			cell.setCellValue("CONDITION");
-
-			cell = row.createCell(3);
-			cell.setCellValue("DESCRIPTION");
-
-			cell = row.createCell(4);
-			cell.setCellValue("CATEGORY");
-
-			// Now a row from each Item:
-			int rowNum = 0;
-
-			for (Item item : items) {
-				String fbURL = item.getUrl(MarketName.FBMarket);
-
-				if (fbURL != null && !fbURL.isEmpty()) {
-					warnings.add(String.format("`%s' is already listed as %s, skipping", item.getName(), fbURL));
-					continue;
-				}
-				// Field order (0-origin): Title, Price, Condition, Description, Category
-				row = sheet.createRow(++rowNum);
-
-				cell = row.createCell(0);
-				cell.setCellValue(item.getName());
-
-				cell = row.createCell(1);
-				cell.setCellValue(item.getAskingPrice().intValue());
-
-				cell = row.createCell(2);
-				if (item.getCondition() == null) {
-					cell.setCellValue("Used - Good"); // Best guess
-				} else {
-					switch(item.getCondition()) {
-						case NEW:
-							cell.setCellValue("New"); break;
-						case LIKE_NEW:
-							cell.setCellValue("New"); break;
-						case USED:
-							cell.setCellValue("Used - Good"); break;
-						case FOR_PARTS:
-							cell.setCellValue("Broken/Not Working"); break;
-						default:
-							break;
-					}
-				}
-
-				cell = row.createCell(3);
-				cell.setCellValue(item.getDescription());
-
-				cell = row.createCell(4);
-				cell.setCellValue(switch(item.getCategory()){
-					case Antiques -> "Antiques & Collectibles";
-					case Artwork -> "Arts & Crafts";
-                    case Automotive -> "Auto Parts";
-                    case Books -> "Books, Movies & Music";
-					case Camping -> "Sports & Outdoors";
-					case ComputersElectronics-> "Electronics & computers";
-					case Furniture-> "Furniture";
-					case Household-> "Household";
-					case Photography-> "Arts & Crafts";
-					case SportingGoods-> "Sports & Outdoors";
-					case Tools -> "Tools";
-					case null -> "XX CATEGORY XX";
-				});
-			}
-
 			wb.write(fileOut);
 			final ListResponse listResponse = new ListResponse(location, rowNum, warnings);
 			if (chatterly) {
-				System.out.printf("Wrote %d items into %s with %d warnings\n",
-						items.size(), location, warnings.size());
+				System.out.printf("Wrote %d items into %s with %d messages\n",
+						numItems, location, warnings.size());
 				System.out.println("listResponse = " + listResponse);
 			}
 			return listResponse;

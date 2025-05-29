@@ -22,6 +22,7 @@ import jakarta.inject.Inject;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import com.darwinsys.eselling.model.Condition;
 
@@ -97,13 +98,13 @@ public class ESalesView extends VerticalLayout {
             }
             final ListResponse resp = fbMarket.list(selectedItems);
             var sb = new StringBuffer(
-                String.format("Saved %d Items with %d warnings",
-                Integer.valueOf(resp.successCount()), resp.warnings().size()));
-            for (String s : resp.warnings()) {
+                String.format("Saved %d Items with %d messages",
+                Integer.valueOf(resp.getSuccessCount()), resp.getMessages().size()));
+            for (String s : resp.getMessages()) {
                 sb.append("; ").append(s);
             }
-            if (resp.successCount() > 0) {
-                sb.append(". Now upload ").append(resp.location())
+            if (resp.getSuccessCount() > 0) {
+                sb.append(". Now upload ").append(resp.getLocation())
                         .append(" to ")
                         .append("to https://www.facebook.com/marketplace/create/bulk");
             }
@@ -250,6 +251,11 @@ public class ESalesView extends VerticalLayout {
             itemService.createItem(newItem);// Refresh the grid
         }
     }
+
+    /** For use as a Binder validator in the URL fields */
+    public static Predicate<String> urlFieldValidator = s -> {
+        return s.isEmpty() || s.startsWith("https://") || s.startsWith("http://");
+    };
 
     private List<Item> getItems() {
         return itemService.getItems();

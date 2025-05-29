@@ -35,7 +35,7 @@ To create a user manually:
 
 Clean up error handling
 
-Add handling of Condition (and Condition Note for eBay)
+Handle validation properly as per https://vaadin.com/docs/latest/flow/binding-data/components-binder
 
 Add fields:
 	Manufacturer's URL?
