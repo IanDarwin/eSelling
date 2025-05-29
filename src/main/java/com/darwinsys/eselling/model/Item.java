@@ -55,6 +55,8 @@ public class Item {
 				Category category,
 				Condition condition, String imageURL) {
 		this(id, name, description, null, price);
+		this.category = category;
+		this.condition = condition;
 		urls = urlsEmpty();
 	}
 
