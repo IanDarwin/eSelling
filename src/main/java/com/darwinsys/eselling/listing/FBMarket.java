@@ -116,7 +116,8 @@ public class FBMarket implements Market<Item> {
 			case ComputersElectronics -> "Electronics & computers";
 			case Furniture -> "Furniture";
 			case Household -> "Household";
-			case Photography -> "Arts & Crafts";
+			case MusicalInstruments -> "Musical Instruments";
+			case Photography -> "Arts & Crafts"; // Procustes was here!
 			case SportingGoods -> "Sports & Outdoors";
 			case Tools -> "Tools";
 			case null -> "XX CATEGORY XX";
