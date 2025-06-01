@@ -1,1 +1,5 @@
+#!/bin/sh
+
+set -x
+
 mvn quarkus:dev
