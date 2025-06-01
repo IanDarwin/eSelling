@@ -79,7 +79,9 @@ public class EBayMarket implements Market<Item> {
             // and X-EBAY-API-COMPATIBILITY-LEVEL.
             // For newer APIs, it's often more standard REST headers.
             Request request = new Request.Builder()
-                    .url(EBAY_TRADING_API_URL) // Replace with the actual endpoint for the chosen API method
+                    .url(EBAY_TRADING_API_URL)
+                    .header("Accept", "application/json")
+                    .header("Content-Type", "application/json")
                     .header("X-EBAY-API-APP-NAME", EBAY_APP_ID)
                     .header("X-EBAY-API-DEV-NAME", EBAY_DEV_ID)
                     .header("X-EBAY-API-CERT-NAME", EBAY_CERT_ID)
@@ -87,25 +89,26 @@ public class EBayMarket implements Market<Item> {
                     .header("X-EBAY-API-COMPATIBILITY-LEVEL", "967") // Example compatibility level for Trading API
                     .header("X-EBAY-API-CALL-NAME", "AddItem") // Example Trading API call name
                     .header("X-EBAY-API-IAF-TOKEN", EBAY_AUTH_TOKEN) // User's OAuth token
+                    .header("X-EBAY-API-DETAIL-LEVEL", "1")
                     .post(body)
                     .build();
 
             // --- 3. Execute the Request and Handle Response ---
             try (Response response = httpClient.newCall(request).execute()) {
-                if (response.isSuccessful()) {
+                if (!response.isSuccessful()) {
+                    String errorBody = Objects.requireNonNull(response.body()).string();
+                    System.err.println("eBay API Error Response (Code: " + response.code() + "):\n" + errorBody);
+                    // Parse the error body to understand the specific error.
+                    return new ListResponse("where", 0, List.of(""));
+                } else {
                     String responseBody = Objects.requireNonNull(response.body()).string();
-                    System.out.println("eBay API Response (Success):\n" + responseBody);
-                    // Here, you would parse the responseBody (JSON or XML) to verify
+                    System.out.println("eBay API Response (Communication success at least):\n" + responseBody);
+                    // Parse the responseBody (JSON or XML) to verify
                     // if the listing was successful, get the item ID, etc.
                     JsonNode rootNode = objectMapper.readTree(responseBody);
                     boolean success = rootNode.path("Ack").asText().equals("Success");
                     // XXX Extract more info!
                     return new ListResponse("where", 1, List.of(""));
-                } else {
-                    String errorBody = Objects.requireNonNull(response.body()).string();
-                    System.err.println("eBay API Error Response (Code: " + response.code() + "):\n" + errorBody);
-                    // Parse the error body to understand the specific error.
-                    return new ListResponse("where", 0, List.of(""));
                 }
             } catch (IOException e) {
                 System.err.println("Network error during eBay API call: " + e.getMessage());
