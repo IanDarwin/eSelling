@@ -8,12 +8,19 @@ public class ListResponse {
     String location;
     int successCount;
     List<String> messages;
+    public StringBuilder stringBuilder = new StringBuilder();
 
     /// Provide constructor only to ensure that messages isn't null
     public ListResponse(String location, int successCount, List<String> messages) {
         this.location = location;
         this.successCount = successCount;
         this.messages = messages;
+    }
+
+    // Mainly for error branches
+    public ListResponse(StringBuilder stringBuilder) {
+        this();
+        this.stringBuilder = stringBuilder;
     }
 
     public ListResponse() {

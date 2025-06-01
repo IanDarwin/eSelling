@@ -1,7 +1,9 @@
 package com.darwinsys.eselling.base;
 
+import com.darwinsys.eselling.listing.EBayMarket;
 import com.darwinsys.eselling.listing.FBMarket;
 import com.darwinsys.eselling.listing.ListResponse;
+import com.darwinsys.eselling.listing.Market;
 import com.darwinsys.eselling.model.Category;
 import com.darwinsys.eselling.model.Item;
 import com.vaadin.flow.component.button.Button;
@@ -28,7 +30,7 @@ import com.darwinsys.eselling.model.Condition;
 
 import static com.darwinsys.eselling.model.Constants.sellSites;
 
-@Route(value = "")
+@Route(value = "/admin")
 @PageTitle("E-Selling")
 @SuppressWarnings("unused") // It really is used!
 public class ESalesView extends VerticalLayout {
@@ -91,27 +93,23 @@ public class ESalesView extends VerticalLayout {
         addButton.addClickListener(event1 -> showItemDialog());
         Button listFBButton = new Button("Export Selected to FB");
         listFBButton.addClickListener(event1 -> {
-            final Set<Item> selectedItems = grid.getSelectedItems();
-            if (selectedItems.isEmpty()) {
-                 showMessageDialog("Correct and resubmit", "No items selected!");
-                 return;
-            }
-            final ListResponse resp = fbMarket.list(selectedItems);
-            var sb = new StringBuffer(
-                String.format("Saved %d Items with %d messages",
-                Integer.valueOf(resp.getSuccessCount()), resp.getMessages().size()));
-            for (String s : resp.getMessages()) {
-                sb.append("; ").append(s);
-            }
+            ListResponse resp = prepareAndList(new FBMarket());
             if (resp.getSuccessCount() > 0) {
-                sb.append(". Now upload ").append(resp.getLocation())
+                resp.stringBuilder.append(". Now upload ").append(resp.getLocation())
                         .append(" to ")
                         .append("to https://www.facebook.com/marketplace/create/bulk");
+				showMessageDialog("Saved to XLSX for upload",  resp.stringBuilder.toString());
             }
-            showMessageDialog("Saved",  sb.toString());
         });
+        Button listEBayButton = new Button("Export Selected to eBay (pre-Beta)");
+        listEBayButton.addClickListener(event1 -> {
+                    ListResponse resp = prepareAndList(new EBayMarket());
+                    if (resp.getSuccessCount() > 0) {
+                        showMessageDialog("Uploaded to eBay!", resp.stringBuilder.toString());
+                    }
+                });
         var bottomRow = new HorizontalLayout();
-        bottomRow.add(addButton, listFBButton);
+        bottomRow.add(addButton, listFBButton, listEBayButton);
         add(header, grid, bottomRow); // Add the button
         setSizeFull();
         grid.setSizeFull();
@@ -138,6 +136,24 @@ public class ESalesView extends VerticalLayout {
             selectedItem = event.getItem();
             showItemDialog(); // Re-use the add item dialog
         });
+    }
+
+    private ListResponse prepareAndList(Market market) {
+        final Set<Item> selectedItems = grid.getSelectedItems();
+        var sb = new StringBuilder();
+        if (selectedItems.isEmpty()) {
+            showMessageDialog("Correct and resubmit", "No items selected!");
+            return new ListResponse(sb);
+        }
+        final ListResponse resp = market.list(selectedItems);
+        sb = resp.stringBuilder;
+        sb.append(
+                String.format("Saved %d Items with %d messages",
+                        Integer.valueOf(resp.getSuccessCount()), resp.getMessages().size()));
+        for (String s : resp.getMessages()) {
+            sb.append("; ").append(s);
+        }
+        return resp;
     }
 
     private void showItemDialog() {
