@@ -21,6 +21,7 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import jakarta.inject.Inject;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
@@ -33,7 +34,7 @@ import static com.darwinsys.eselling.model.Constants.sellSites;
 @Route(value = "/admin")
 @PageTitle("E-Selling")
 @SuppressWarnings("unused") // It really is used!
-public class ESalesView extends VerticalLayout {
+public class AdminView extends VerticalLayout {
 
     @Inject ItemService itemService;
     @Inject LoginService loginService;
@@ -52,7 +53,7 @@ public class ESalesView extends VerticalLayout {
     private List<Item> items;
     private List<TextField> urlFields;
 
-    public ESalesView() {
+    public AdminView() {
 
         if (!isLoggedIn) {
             showLoginDialog();
@@ -127,7 +128,7 @@ public class ESalesView extends VerticalLayout {
         items = getItems();
         grid.setItems(items); // Use the stored items list
         grid.setSelectionMode(Grid.SelectionMode.MULTI);
-        grid.setColumns("name", "listed", "description", "condition", "askingPrice");
+        grid.setColumns("name", "listed", "description", "category", "condition", "askingPrice");
         grid.getColumnByKey("name").setHeader("Item Name");
         grid.getColumnByKey("askingPrice").setHeader("Asking Price");
         grid.getColumnByKey("listed").setHeader("Listed(any)?");

@@ -8,16 +8,16 @@ class ESalesViewTest {
 
     @Test
     public void testUrlValidatorNotEntered() {
-        assertTrue(ESalesView.urlFieldValidator.test(""));
+        assertTrue(AdminView.urlFieldValidator.test(""));
     }
 
     @Test
     public void testUrlValidatorGood() {
-        assertTrue(ESalesView.urlFieldValidator.test("http://listingco.com/item/12345"));
+        assertTrue(AdminView.urlFieldValidator.test("http://listingco.com/item/12345"));
     }
 
     @Test
     public void testUrlValidatorBad() {
-        assertFalse(ESalesView.urlFieldValidator.test("meep meep"));
+        assertFalse(AdminView.urlFieldValidator.test("meep meep"));
     }
 }
