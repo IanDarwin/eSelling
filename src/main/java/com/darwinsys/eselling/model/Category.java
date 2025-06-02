@@ -14,5 +14,10 @@ public enum Category {
 	MusicalInstruments,
 	Photography,
 	SportingGoods,
-	Tools,
+	Tools;
+
+	/** Convert names like SportingGoods to printable "Sporting Goods" */
+	public String toString() {
+		return name().replaceAll("([a-z])([A-Z])", "$1 $2");
+	}
 }
