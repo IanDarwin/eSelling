@@ -125,7 +125,7 @@ public class AdminView extends VerticalLayout {
 
         categoryComboBox.setItems(Category.values()); // No default value
 
-        items = getItems();
+        items = itemService.getAllItems();
         grid.setItems(items); // Use the stored items list
         grid.setSelectionMode(Grid.SelectionMode.MULTI);
         grid.setColumns("name", "listed", "description", "category", "condition", "askingPrice");
@@ -190,7 +190,7 @@ public class AdminView extends VerticalLayout {
 
         Button saveButton = new Button("Save", event -> {
             saveItem();
-            items = getItems();
+            items = itemService.getItems();
             grid.setItems(items);
             dialog.close();
             selectedItem = null;
@@ -273,8 +273,4 @@ public class AdminView extends VerticalLayout {
     public static Predicate<String> urlFieldValidator = s -> {
         return s.isEmpty() || s.startsWith("https://") || s.startsWith("http://");
     };
-
-    private List<Item> getItems() {
-        return itemService.getItems();
-    }
 }

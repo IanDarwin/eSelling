@@ -20,12 +20,20 @@ public class ItemService implements Serializable {
     @Inject
     EntityManager em;
 
+    public List<Item> getAllItems() {
+        return em.createQuery(
+                "SELECT i from Item i WHERE active IS true order by name", Item.class).getResultList();
+    }
+
     public List<Item> getItems() {
-        return em.createQuery("SELECT i from Item i WHERE active IS true order by name", Item.class).getResultList();
+        return em.createQuery(
+                // Want to add: AND urls != '{"","","","",""}' but that doesn't compute.
+                "SELECT i from Item i WHERE active IS true  order by name", Item.class).getResultList();
     }
 
     public List<Item> getItems(Category category) {
-        final TypedQuery<Item> query = em.createQuery("SELECT i FROM Item i WHERE i.category = ?1 AND active IS true order by name", Item.class);
+        final TypedQuery<Item> query = em.createQuery(
+                "SELECT i FROM Item i WHERE i.category = ?1 AND active IS true order by name", Item.class);
         query.setParameter(1, category);
         return query.getResultList();
     }
