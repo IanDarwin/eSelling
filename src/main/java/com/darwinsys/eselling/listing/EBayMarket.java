@@ -1,190 +1,345 @@
 package com.darwinsys.eselling.listing;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
-
-import com.darwinsys.eselling.model.Category;
-import com.darwinsys.eselling.model.Condition;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper; // For JSON serialization
-import okhttp3.*; // For making HTTP requests (using Square's OkHttp library)
-
 import com.darwinsys.eselling.model.Item;
+import com.darwinsys.eselling.model.Condition;
+import com.darwinsys.eselling.model.Category;
+import org.springframework.http.*;
+import org.springframework.web.client.RestTemplate;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class EBayMarket implements Market<Item> {
+import java.util.Collection;
+import java.util.List;
 
-    private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
-    private final OkHttpClient httpClient;
-    private final ObjectMapper objectMapper;
+/**
+ * Class to list Item objects on eBay.
+ * @author Initial version by Google Gemini
+ */
+public class EBayMarket implements Market {
 
-    List<String> messages = new ArrayList<>();
+    private final String EBAY_API_BASE_URL = "https://api.ebay.com/sell/inventory/v1"; // Or production URL
+    private final RestTemplate restTemplate;
+    private final String accessToken; //  eBay OAuth access token
 
-    // Replace with the actual eBay API endpoint and credentials
-    private static final String EBAY_TRADING_API_URL = "https://api.ebay.com/ws/api.dll"; // Trading API
-    private static final String EBAY_APP_ID = "YOUR_EBAY_APP_ID";
-    private static final String EBAY_DEV_ID = "YOUR_EBAY_DEV_ID";
-    private static final String EBAY_CERT_ID = "YOUR_EBAY_CERT_ID";
-    private static final String EBAY_AUTH_TOKEN = "YOUR_USER_AUTH_TOKEN"; // User's OAuth token
-
-    public EBayMarket() {
-        this.httpClient = new OkHttpClient.Builder()
-                .connectTimeout(10, TimeUnit.SECONDS)
-                .writeTimeout(10, TimeUnit.SECONDS)
-                .readTimeout(30, TimeUnit.SECONDS)
-                .build();
-        this.objectMapper = new ObjectMapper();
+    public EBayMarket(String accessToken) {
+        this.restTemplate = new RestTemplate();
+        this.accessToken = accessToken;
     }
+
 
     @Override
     public void startStream(String location) {
-        // empty
+
     }
 
     @Override
     public ListResponse closeStream() {
-        return new ListResponse("eBay", 1, messages);
+        return null;
     }
 
     /**
-     * Extracts fields from an Item object and attempts to send them to eBay for listing
-     * via a simulated REST call.
+     * Creates a listing for an item on eBay using the Inventory API.
+     * This example focuses on creating an "offer" and then "publishing" it.
+     * The Inventory API requires you to first create a inventory item, then an offer,
+     * and then publish the offer.
      *
-     * @param item The Item objects to be posted to eBay.
-     * @return ListResponse with successCount > 0 if the listing request was conceptually successful.
-     * @throws RuntimeException if there's an issue with network communication or JSON processing.
+     * @param item The Item object to list.
+     * @return The ID of the created eBay listing (offer ID), or null if creation failed.
      */
     public ListResponse list(Item item) {
-            Objects.requireNonNull(item, "Item cannot be null.");
-
-            // --- 1. Prepare the request payload in JSON for the Sell API ---
-            String jsonPayload;
-            try {
-                // For a real eBay API integration, you'd construct a more complex JSON object
-                // that strictly adheres to the eBay API's request schema.
-                // This is a simplified example of what that data might look like.
-                jsonPayload = objectMapper.writeValueAsString(createEbayListingRequest(item));
-                System.out.println("Prepared JSON Payload:\n" + jsonPayload);
-            } catch (Exception e) {
-                System.err.println("Error serializing item to JSON: " + e.getMessage());
-                throw new RuntimeException("Failed to create JSON payload", e);
-            }
-
-            // --- 2. Build the HTTP Request ---
-            RequestBody body = RequestBody.create(jsonPayload, JSON);
-
-            // For Trading API, the headers are typically different and include X-EBAY-API-CALL-NAME
-            // and X-EBAY-API-COMPATIBILITY-LEVEL.
-            // For newer APIs, it's often more standard REST headers.
-            Request request = new Request.Builder()
-                    .url(EBAY_TRADING_API_URL)
-                    .header("Accept", "application/json")
-                    .header("Content-Type", "application/json")
-                    .header("X-EBAY-API-APP-NAME", EBAY_APP_ID)
-                    .header("X-EBAY-API-DEV-NAME", EBAY_DEV_ID)
-                    .header("X-EBAY-API-CERT-NAME", EBAY_CERT_ID)
-                    .header("X-EBAY-API-SITEID", "0") // 0 for US, adjust for other sites
-                    .header("X-EBAY-API-COMPATIBILITY-LEVEL", "967") // Example compatibility level for Trading API
-                    .header("X-EBAY-API-CALL-NAME", "AddItem") // Example Trading API call name
-                    .header("X-EBAY-API-IAF-TOKEN", EBAY_AUTH_TOKEN) // User's OAuth token
-                    .header("X-EBAY-API-DETAIL-LEVEL", "1")
-                    .post(body)
-                    .build();
-
-            // --- 3. Execute the Request and Handle Response ---
-            try (Response response = httpClient.newCall(request).execute()) {
-                if (!response.isSuccessful()) {
-                    String errorBody = Objects.requireNonNull(response.body()).string();
-                    System.err.println("eBay API Error Response (Code: " + response.code() + "):\n" + errorBody);
-                    // Parse the error body to understand the specific error.
-                    return new ListResponse("where", 0, List.of(""));
-                } else {
-                    String responseBody = Objects.requireNonNull(response.body()).string();
-                    System.out.println("eBay API Response (Communication success at least):\n" + responseBody);
-                    // Parse the responseBody (JSON or XML) to verify
-                    // if the listing was successful, get the item ID, etc.
-                    JsonNode rootNode = objectMapper.readTree(responseBody);
-                    boolean success = rootNode.path("Ack").asText().equals("Success");
-                    // XXX Extract more info!
-                    return new ListResponse("where", 1, List.of(""));
+        try {
+            // 1. Create/Update Inventory Item (Product)
+            // This is a simplified representation. In a real scenario, you'd manage
+            // inventory item IDs or check if an item already exists.
+            // XXX This mixes up the inventoryId with the id
+            String inventoryItemId = item.getId() != null ? "item_" + item.getId() : "new_item_" + System.currentTimeMillis();
+            if (item.getId() != null) {
+                // If item ID exists, attempt to update inventory item
+                updateEbayInventoryItem(item, inventoryItemId);
+            } else {
+                // Otherwise create new inventory item
+                inventoryItemId = createEbayInventoryItem(item);
+                if (inventoryItemId == null) {
+                    System.err.println("Failed to create eBay inventory item.");
+                    return null;
                 }
-            } catch (IOException e) {
-                System.err.println("Network error during eBay API call: " + e.getMessage());
-                throw new RuntimeException("Network error: " + e, e);
             }
+
+            // 2. Create Offer
+            String offerId = createEbayOffer(item, inventoryItemId);
+            if (offerId == null) {
+                System.err.println("Failed to create eBay offer for item: " + item.getName());
+                return null;
+            }
+
+            // 3. Publish Offer
+            if (publishEbayOffer(offerId)) {
+                System.out.println("Successfully listed item '" + item.getName() + "' on eBay with offer ID: " + offerId);
+                return new ListResponse(offerId, 1, List.of());
+            } else {
+                System.err.println("Failed to publish eBay offer for item: " + item.getName());
+                return null;
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error listing item on eBay: " + e.getMessage());
+            e.printStackTrace();
+            return null;
         }
-
-
-    /**
-     * Helper method to construct a simplified eBay listing request payload.
-     * In a real application, this would be a more complex POJO or map
-     * strictly mapping to eBay's API schema.
-     *
-     * @param item The Item object.
-     * @return A Map representing the JSON payload for eBay.
-     */
-    private Object createEbayListingRequest(Item item) {
-        // This is a highly simplified structure.
-        // Refer to eBay's API documentation for the exact required fields and structure.
-        // A Sell API createItemDraft or publishItem would have a specific JSON schema.
-
-        // JSON structure for listing an item:
-        var conditionId = switch(item.getCondition()) {
-            case USED -> 3000;
-            case NEW -> 1000;
-            case LIKE_NEW -> 2000;
-            case FOR_PARTS -> 4000;
-        };
-        var categoryId = "1234";
-        var imageRequest = new ImageDetails("foo.jpg");
-        return new ItemListingRequest(
-                item.getName(),
-                item.getDescription(),
-                new Amount(item.getAskingPrice(), "USD"),
-                item.getQuantity(),
-                categoryId,
-                Integer.toString(conditionId),
-                imageRequest
-                // May need to add other necessary fields like shipping, return policy, payment methods
-        );
     }
 
-    // --- DTO records to model the JSON payload (incomplete?) ---
-    private record ItemListingRequest(
-        String title,
-        String description,
-        Amount pricing,
-        int quantity,
-        String categoryId,
-        String conditionId,
-        ImageDetails image) {
-	}
+    @Override
+    public ListResponse list(Collection collection) {
+        return Market.super.list(collection);
+    }
 
-    private record Amount(double currentPrice, String currency) {}
+    /**
+     * Creates an inventory item (product) in eBay's inventory system.
+     *
+     * @param item The Item object.
+     * @return The SKU (inventory item ID) if successful, null otherwise.
+     */
+    private String createEbayInventoryItem(Item item) {
+        HttpHeaders headers = createAuthHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
-    private record ImageDetails(String primaryImage) {}
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode itemNode = mapper.createObjectNode();
+        itemNode.put("productFamily", "STANDARD"); // Or "MULTIVARIATION"
+        ObjectNode product = itemNode.putObject("product");
+        product.put("title", item.getName());
+        product.put("description", item.getDescription());
+        product.put("aspects", mapper.createObjectNode().put("Brand", "Generic")); // Example aspect
 
-    // --- Main method for demonstration ---
+        ArrayNode imageUrls = product.putArray("imageUrls");
+        if (item.getPhotos() != null) {
+            item.getPhotos().forEach(imageUrls::add);
+        }
+
+        // Map the Condition enum to eBay's condition ID
+        // You'll need a more robust mapping for real-world scenarios.
+        String ebayCondition = mapConditionToEbay(item.getCondition());
+        if (ebayCondition != null) {
+            product.put("condition", ebayCondition);
+        }
+        if (item.getConditionQualification() != null && !item.getConditionQualification().isEmpty()) {
+            product.put("conditionDescription", item.getConditionQualification());
+        }
+
+        HttpEntity<String> requestEntity = new HttpEntity<>(itemNode.toString(), headers);
+        String sku = "SKU_" + item.getId() + "_" + System.currentTimeMillis(); // A unique SKU for the inventory item
+
+        try {
+            // Note: The eBay API uses SKU as the path parameter for inventory items
+            String url = EBAY_API_BASE_URL + "/inventory_item/" + sku;
+            restTemplate.exchange(url, HttpMethod.PUT, requestEntity, Void.class);
+            System.out.println("Successfully created/updated eBay inventory item with SKU: " + sku);
+            return sku;
+        } catch (Exception e) {
+            System.err.println("Error creating/updating eBay inventory item: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Updates an inventory item (product) in eBay's inventory system.
+     *
+     * @param item The Item object.
+     * @param sku The SKU (inventory item ID) if successful, null otherwise.
+     * @return True if the update succeeded, false otherwise
+     */
+    private boolean updateEbayInventoryItem(Item item, String sku) {
+        HttpHeaders headers = createAuthHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode itemNode = mapper.createObjectNode();
+        itemNode.put("productFamily", "STANDARD"); // Or "MULTIVARIATION"
+        ObjectNode product = itemNode.putObject("product");
+        product.put("title", item.getName());
+        product.put("description", item.getDescription());
+        product.put("aspects", mapper.createObjectNode().put("Brand", "Generic")); // Example aspect
+
+        ArrayNode imageUrls = product.putArray("imageUrls");
+        if (item.getPhotos() != null) {
+            item.getPhotos().forEach(imageUrls::add);
+        }
+
+        // Map the Condition enum to eBay's condition ID
+        String ebayCondition = mapConditionToEbay(item.getCondition());
+        if (ebayCondition != null) {
+            product.put("condition", ebayCondition);
+        }
+        if (item.getConditionQualification() != null && !item.getConditionQualification().isEmpty()) {
+            product.put("conditionDescription", item.getConditionQualification());
+        }
+
+        HttpEntity<String> requestEntity = new HttpEntity<>(itemNode.toString(), headers);
+
+        try {
+            String url = EBAY_API_BASE_URL + "/inventory_item/" + sku;
+            restTemplate.exchange(url, HttpMethod.PUT, requestEntity, Void.class);
+            System.out.println("Successfully updated eBay inventory item with SKU: " + sku);
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error updating eBay inventory item: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Create an offer for an inventory item on eBay.
+     * @param item The Item object.
+     * @param inventoryItemId The SKU of the inventory item to create an offer for.
+     * @return The offer ID if successful, null otherwise.
+     */
+    private String createEbayOffer(Item item, String inventoryItemId) {
+        HttpHeaders headers = createAuthHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode offerNode = mapper.createObjectNode();
+        offerNode.put("sku", inventoryItemId);
+        offerNode.put("marketplaceId", "EBAY_CA"); // Or EBAY_US, EBAY_DE, etc.
+        offerNode.put("format", "FIXED_PRICE"); // Or "AUCTION"
+        offerNode.put("availableQuantity", item.getQuantity());
+
+        ObjectNode listingPolicies = offerNode.putObject("listingPolicies");
+        listingPolicies.put("fulfillmentPolicyId", "YOUR_FULFILLMENT_POLICY_ID"); // XXX
+        listingPolicies.put("paymentPolicyId", "YOUR_PAYMENT_POLICY_ID");     // XXX
+        listingPolicies.put("returnPolicyId", "YOUR_RETURN_POLICY_ID");       // XXX
+
+        ObjectNode pricing = offerNode.putObject("pricingSummary");
+        ObjectNode price = pricing.putObject("price");
+        price.put("value", item.getAskingPrice());
+        price.put("currency", "CAD"); // Or USD, EUR, etc.
+
+        // You can add more fields as needed, e.g., listing description, start/end dates, taxes, etc.
+        // For categories, eBay uses category IDs. You'll need a mapping.
+        // This is a simplified example:
+        String ebayCategoryId = mapCategoryToEbayId(item.getCategory());
+        if (ebayCategoryId != null) {
+            offerNode.put("categoryId", ebayCategoryId);
+        }
+
+        HttpEntity<String> requestEntity = new HttpEntity<>(offerNode.toString(), headers);
+
+        try {
+            String url = EBAY_API_BASE_URL + "/offer";
+            ResponseEntity<JsonNode> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, JsonNode.class);
+
+            if (response.getStatusCode() == HttpStatus.CREATED) {
+                JsonNode responseBody = response.getBody();
+                if (responseBody != null && responseBody.has("offerId")) {
+                    System.out.println("Successfully created eBay offer: " + responseBody.get("offerId").asText());
+                    return responseBody.get("offerId").asText();
+                }
+            }
+            System.err.println("Failed to create eBay offer. Status: " + response.getStatusCode() + ", Body: " + response.getBody());
+            return null;
+        } catch (Exception e) {
+            System.err.println("Error creating eBay offer: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Publish an offer to make it live on eBay.
+     * @param offerId The ID of the offer to publish.
+     * @return True if publishing was successful, false otherwise.
+     */
+    private boolean publishEbayOffer(String offerId) {
+        HttpHeaders headers = createAuthHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers); // No body needed for publish
+
+        try {
+            String url = EBAY_API_BASE_URL + "/offer/" + offerId + "/publish";
+            ResponseEntity<JsonNode> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, JsonNode.class);
+
+            if (response.getStatusCode() == HttpStatus.OK) {
+                JsonNode responseBody = response.getBody();
+                if (responseBody != null && responseBody.has("listingId")) {
+                    System.out.println("Successfully published eBay offer. Listing ID: " + responseBody.get("listingId").asText());
+                    return true;
+                }
+            }
+            System.err.println("Failed to publish eBay offer. Status: " + response.getStatusCode() + ", Body: " + response.getBody());
+            return false;
+        } catch (Exception e) {
+            System.err.println("Error publishing eBay offer: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Helper to create HTTP headers with the Authorization token.
+     * @return HttpHeaders with Authorization.
+     */
+    private HttpHeaders createAuthHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+        headers.set("Accept", "application/json");
+        headers.set("Content-Language", "en-CA"); // Set appropriate content language
+        return headers;
+    }
+
+    /**
+     * Maps the internal Condition enum to eBay's condition string.
+     * XXX need a more comprehensive mapping based on eBay's documentation.
+     */
+    private String mapConditionToEbay(Condition condition) {
+        if (condition == null) {
+            return null;
+        }
+        switch (condition) {
+            case NEW: return "NEW_WITH_TAGS"; // Or "NEW" depending on exact eBay condition
+            case USED: return "USED";
+            // Add more mappings as per eBay's condition ID list
+            default: return null;
+        }
+    }
+
+    /**
+     * Maps the internal Category enum to an eBay category ID.
+     * This is a critical part of eBay listing and requires careful mapping.
+     * You'll likely need to use eBay's Taxonomy API to find appropriate category IDs.
+     */
+    private String mapCategoryToEbayId(Category category) {
+        if (category == null) {
+            return null;
+        }
+        // This is a simplified mapping. In a real application, you'd have a more robust
+        // way to get eBay category IDs (e.g., from a database, configuration, or Taxonomy API).
+        switch (category) {
+            case ComputersElectronics: return "15032";
+            case Books: return "267";
+            case Household: return "11700";
+            default: return null;
+        }
+    }
+
+    // XXX may want methods for:
+    // - Retrieving offers
+    // - Ending offers
+    // - Updating offers
+    // - Managing inventory items (getting, deleting)
+    // Although initially these will be low-volumen enough
+    // that they can be done through the web ui.
+
+    // Quickie main - make into a test when further along.
     public static void main(String[] args) {
-        EBayMarket lister = new EBayMarket();
-
-        // Create a dummy item
-        Item newItem = new Item(0,
-                "Vintage Collectible Action Figure",
-                "A rare, never-opened vintage action figure from the 80s. Perfect for collectors!",
-                199.99,
-                Category.Antiques, // Example category ID for Collectible Action Figures
-                Condition.LIKE_NEW,   // New
-                "http://example.com/images/figure123.jpg"
-        );
-
-		ListResponse response = lister.list(newItem);
-		if (response.getSuccessCount() > 0) {
-			System.out.println("Item listing request sent successfully (simulated).");
-		} else {
-			System.out.println("Item listing request failed (simulated). Check error logs.");
-		}
+        var lister = new EBayMarket("test_access_token");
+        var item = new Item();
+        Item item1 = new Item();
+        item1.setName("Something for sale");
+        item1.setDescription("""
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.""");
+        item1.setAskingPrice(42d);
+        item1.setCondition(Condition.USED);
+        lister.list(item);
     }
 }
