@@ -33,7 +33,7 @@ public class Item {
     List<String> photos;
 
 	@SuppressWarnings("unused") // JPA
-	private Long getId() {
+    public Long getId() {
 		return id;
 	}
 	@SuppressWarnings("unused") // JPA

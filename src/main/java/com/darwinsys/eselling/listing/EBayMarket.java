@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Class to list Item objects on eBay.
@@ -292,9 +293,7 @@ public class EBayMarket implements Market {
      * XXX need a more comprehensive mapping based on eBay's documentation.
      */
     private String mapConditionToEbay(Condition condition) {
-        if (condition == null) {
-            return null;
-        }
+        Objects.requireNonNull(condition, "Condition may not be null");
         switch (condition) {
             case NEW: return "NEW_WITH_TAGS"; // Or "NEW" depending on exact eBay condition
             case USED: return "USED";
@@ -309,9 +308,7 @@ public class EBayMarket implements Market {
      * You'll likely need to use eBay's Taxonomy API to find appropriate category IDs.
      */
     private String mapCategoryToEbayId(Category category) {
-        if (category == null) {
-            return null;
-        }
+        Objects.requireNonNull(category, "Category may not be null");
         // This is a simplified mapping. In a real application, you'd have a more robust
         // way to get eBay category IDs (e.g., from a database, configuration, or Taxonomy API).
         switch (category) {
@@ -334,12 +331,13 @@ public class EBayMarket implements Market {
     public static void main(String[] args) {
         var lister = new EBayMarket("test_access_token");
         var item = new Item();
-        Item item1 = new Item();
-        item1.setName("Something for sale");
-        item1.setDescription("""
+        item.setName("Something for sale");
+        item.setDescription("""
                 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.""");
-        item1.setAskingPrice(42d);
-        item1.setCondition(Condition.USED);
+        item.setAskingPrice(42.5d);
+        item.setCondition(Condition.USED);
+        item.setConditionQualification("Only used by a little old gorilla on Tuesdays at noon");
+        item.setCategory(Category.Antiques);
         lister.list(item);
     }
 }
