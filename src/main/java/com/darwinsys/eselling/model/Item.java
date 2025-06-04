@@ -32,6 +32,12 @@ public class Item {
     int quantity = 1;
     List<String> photos;
 
+	// Fields specific to EBAY
+	private String ebaySku; // Stores the eBay Inventory Item SKU
+	private String ebayOfferId; // Stores the eBay Offer ID
+	private String ebayListingId; // Stores the final eBay Listing ID (returned after publishing the offer)
+
+
 	@SuppressWarnings("unused") // JPA
     public Long getId() {
 		return id;
@@ -170,5 +176,29 @@ public class Item {
     }
 	public void setActive(Boolean active) {
 		this.active = active;
+	}
+
+	public String getEbaySku() {
+		return ebaySku;
+	}
+
+	public void setEbaySku(String ebaySku) {
+		this.ebaySku = ebaySku;
+	}
+
+	public String getEbayOfferId() {
+		return ebayOfferId;
+	}
+
+	public void setEbayOfferId(String ebayOfferId) {
+		this.ebayOfferId = ebayOfferId;
+	}
+
+	public String getEbayListingId() {
+		return ebayListingId;
+	}
+
+	public void setEbayListingId(String ebayListingId) {
+		this.ebayListingId = ebayListingId;
 	}
 }

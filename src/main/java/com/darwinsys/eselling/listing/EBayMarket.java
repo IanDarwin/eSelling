@@ -51,34 +51,52 @@ public class EBayMarket implements Market {
      */
     public ListResponse list(Item item) {
         try {
+            String inventoryItemId;
+
             // 1. Create/Update Inventory Item (Product)
-            // This is a simplified representation. In a real scenario, you'd manage
-            // inventory item IDs or check if an item already exists.
-            // XXX This mixes up the inventoryId with the id
-            String inventoryItemId = item.getId() != null ? "item_" + item.getId() : "new_item_" + System.currentTimeMillis();
-            if (item.getId() != null) {
-                // If item ID exists, attempt to update inventory item
-                updateEbayInventoryItem(item, inventoryItemId);
-            } else {
-                // Otherwise create new inventory item
-                inventoryItemId = createEbayInventoryItem(item);
-                if (inventoryItemId == null) {
-                    System.err.println("Failed to create eBay inventory item.");
+            if (item.getEbaySku() != null && !item.getEbaySku().isEmpty()) {
+                // If an eBay SKU already exists, attempt to update the existing inventory item
+                inventoryItemId = item.getEbaySku();
+                if (!updateEbayInventoryItem(item, inventoryItemId)) {
+                    System.err.println("Failed to update eBay inventory item for SKU: " + inventoryItemId);
                     return null;
                 }
+            } else {
+                // Otherwise, create a new inventory item
+                inventoryItemId = createEbayInventoryItem(item);
+                if (inventoryItemId == null) {
+                    System.err.println("Failed to create eBay inventory item for item: " + item.getName());
+                    return null;
+                }
+                item.setEbaySku(inventoryItemId); // Store the newly created SKU
             }
 
-            // 2. Create Offer
-            String offerId = createEbayOffer(item, inventoryItemId);
-            if (offerId == null) {
-                System.err.println("Failed to create eBay offer for item: " + item.getName());
-                return null;
+            // 2. Create or Update Offer
+            String offerId;
+            if (item.getEbayOfferId() != null && !item.getEbayOfferId().isEmpty()) {
+                // If an eBay Offer ID exists, attempt to update the existing offer
+                offerId = item.getEbayOfferId();
+                if (!updateEbayOffer(item, inventoryItemId, offerId)) {
+                    System.err.println("Failed to update eBay offer for offer ID: " + offerId);
+                    return null;
+                }
+            } else {
+                // Otherwise, create a new offer
+                offerId = createEbayOffer(item, inventoryItemId);
+                if (offerId == null) {
+                    System.err.println("Failed to create eBay offer for item: " + item.getName());
+                    return null;
+                }
+                item.setEbayOfferId(offerId); // Store the newly created Offer ID
             }
+
 
             // 3. Publish Offer
-            if (publishEbayOffer(offerId)) {
-                System.out.println("Successfully listed item '" + item.getName() + "' on eBay with offer ID: " + offerId);
-                return new ListResponse(offerId, 1, List.of());
+            String listingId = publishEbayOffer(offerId);
+            if (listingId != null) {
+                item.setEbayListingId(listingId); // Store the final eBay Listing ID
+                System.out.println("Successfully listed item '" + item.getName() + "' on eBay with listing ID: " + listingId);
+                return new ListResponse(item.getEbayListingId(), 1, List.of()); // Return the updated item
             } else {
                 System.err.println("Failed to publish eBay offer for item: " + item.getName());
                 return null;
@@ -119,8 +137,6 @@ public class EBayMarket implements Market {
             item.getPhotos().forEach(imageUrls::add);
         }
 
-        // Map the Condition enum to eBay's condition ID
-        // You'll need a more robust mapping for real-world scenarios.
         String ebayCondition = mapConditionToEbay(item.getCondition());
         if (ebayCondition != null) {
             product.put("condition", ebayCondition);
@@ -130,26 +146,27 @@ public class EBayMarket implements Market {
         }
 
         HttpEntity<String> requestEntity = new HttpEntity<>(itemNode.toString(), headers);
-        String sku = "SKU_" + item.getId() + "_" + System.currentTimeMillis(); // A unique SKU for the inventory item
+        // Generate a unique SKU based on your internal Item ID or other unique identifier
+        // This SKU needs to be unique across your eBay inventory.
+        String sku = "SKU_" + item.getId() + "_" + System.currentTimeMillis();
 
         try {
-            // Note: The eBay API uses SKU as the path parameter for inventory items
             String url = EBAY_API_BASE_URL + "/inventory_item/" + sku;
             restTemplate.exchange(url, HttpMethod.PUT, requestEntity, Void.class);
-            System.out.println("Successfully created/updated eBay inventory item with SKU: " + sku);
+            System.out.println("Successfully created eBay inventory item with SKU: " + sku);
             return sku;
         } catch (Exception e) {
-            System.err.println("Error creating/updating eBay inventory item: " + e.getMessage());
+            System.err.println("Error creating eBay inventory item: " + e.getMessage());
             return null;
         }
     }
 
     /**
-     * Updates an inventory item (product) in eBay's inventory system.
+     * Updates an existing inventory item (product) in eBay's inventory system.
      *
-     * @param item The Item object.
-     * @param sku The SKU (inventory item ID) if successful, null otherwise.
-     * @return True if the update succeeded, false otherwise
+     * @param item The Item object with updated details.
+     * @param sku The existing eBay SKU for the item.
+     * @return True if update was successful, false otherwise.
      */
     private boolean updateEbayInventoryItem(Item item, String sku) {
         HttpHeaders headers = createAuthHeaders();
@@ -157,18 +174,17 @@ public class EBayMarket implements Market {
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode itemNode = mapper.createObjectNode();
-        itemNode.put("productFamily", "STANDARD"); // Or "MULTIVARIATION"
+        itemNode.put("productFamily", "STANDARD");
         ObjectNode product = itemNode.putObject("product");
         product.put("title", item.getName());
         product.put("description", item.getDescription());
-        product.put("aspects", mapper.createObjectNode().put("Brand", "Generic")); // Example aspect
+        product.put("aspects", mapper.createObjectNode().put("Brand", "Generic"));
 
         ArrayNode imageUrls = product.putArray("imageUrls");
         if (item.getPhotos() != null) {
             item.getPhotos().forEach(imageUrls::add);
         }
 
-        // Map the Condition enum to eBay's condition ID
         String ebayCondition = mapConditionToEbay(item.getCondition());
         if (ebayCondition != null) {
             product.put("condition", ebayCondition);
@@ -191,7 +207,8 @@ public class EBayMarket implements Market {
     }
 
     /**
-     * Create an offer for an inventory item on eBay.
+     * Creates an offer for an inventory item on eBay.
+     *
      * @param item The Item object.
      * @param inventoryItemId The SKU of the inventory item to create an offer for.
      * @return The offer ID if successful, null otherwise.
@@ -208,18 +225,15 @@ public class EBayMarket implements Market {
         offerNode.put("availableQuantity", item.getQuantity());
 
         ObjectNode listingPolicies = offerNode.putObject("listingPolicies");
-        listingPolicies.put("fulfillmentPolicyId", "YOUR_FULFILLMENT_POLICY_ID"); // XXX
-        listingPolicies.put("paymentPolicyId", "YOUR_PAYMENT_POLICY_ID");     // XXX
-        listingPolicies.put("returnPolicyId", "YOUR_RETURN_POLICY_ID");       // XXX
+        listingPolicies.put("fulfillmentPolicyId", "YOUR_FULFILLMENT_POLICY_ID");
+        listingPolicies.put("paymentPolicyId", "YOUR_PAYMENT_POLICY_ID");
+        listingPolicies.put("returnPolicyId", "YOUR_RETURN_POLICY_ID");
 
         ObjectNode pricing = offerNode.putObject("pricingSummary");
         ObjectNode price = pricing.putObject("price");
         price.put("value", item.getAskingPrice());
-        price.put("currency", "CAD"); // Or USD, EUR, etc.
+        price.put("currency", "CAD");
 
-        // You can add more fields as needed, e.g., listing description, start/end dates, taxes, etc.
-        // For categories, eBay uses category IDs. You'll need a mapping.
-        // This is a simplified example:
         String ebayCategoryId = mapCategoryToEbayId(item.getCategory());
         if (ebayCategoryId != null) {
             offerNode.put("categoryId", ebayCategoryId);
@@ -247,11 +261,59 @@ public class EBayMarket implements Market {
     }
 
     /**
-     * Publish an offer to make it live on eBay.
-     * @param offerId The ID of the offer to publish.
-     * @return True if publishing was successful, false otherwise.
+     * Updates an existing offer for an inventory item on eBay.
+     *
+     * @param item The Item object with updated details.
+     * @param inventoryItemId The SKU of the inventory item associated with the offer.
+     * @param offerId The existing eBay Offer ID to update.
+     * @return True if update was successful, false otherwise.
      */
-    private boolean publishEbayOffer(String offerId) {
+    private boolean updateEbayOffer(Item item, String inventoryItemId, String offerId) {
+        HttpHeaders headers = createAuthHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode offerNode = mapper.createObjectNode();
+        offerNode.put("sku", inventoryItemId);
+        offerNode.put("marketplaceId", "EBAY_CA");
+        offerNode.put("format", "FIXED_PRICE");
+        offerNode.put("availableQuantity", item.getQuantity());
+
+        ObjectNode listingPolicies = offerNode.putObject("listingPolicies");
+        listingPolicies.put("fulfillmentPolicyId", "YOUR_FULFILLMENT_POLICY_ID");
+        listingPolicies.put("paymentPolicyId", "YOUR_PAYMENT_POLICY_ID");
+        listingPolicies.put("returnPolicyId", "YOUR_RETURN_POLICY_ID");
+
+        ObjectNode pricing = offerNode.putObject("pricingSummary");
+        ObjectNode price = pricing.putObject("price");
+        price.put("value", item.getAskingPrice());
+        price.put("currency", "CAD");
+
+        String ebayCategoryId = mapCategoryToEbayId(item.getCategory());
+        if (ebayCategoryId != null) {
+            offerNode.put("categoryId", ebayCategoryId);
+        }
+
+        HttpEntity<String> requestEntity = new HttpEntity<>(offerNode.toString(), headers);
+
+        try {
+            String url = EBAY_API_BASE_URL + "/offer/" + offerId;
+            restTemplate.exchange(url, HttpMethod.PUT, requestEntity, Void.class); // Use PUT for updating
+            System.out.println("Successfully updated eBay offer with ID: " + offerId);
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error updating eBay offer: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Publishes an offer to make it live on eBay.
+     *
+     * @param offerId The ID of the offer to publish.
+     * @return The final eBay Listing ID if successful, null otherwise.
+     */
+    private String publishEbayOffer(String offerId) {
         HttpHeaders headers = createAuthHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -265,19 +327,20 @@ public class EBayMarket implements Market {
                 JsonNode responseBody = response.getBody();
                 if (responseBody != null && responseBody.has("listingId")) {
                     System.out.println("Successfully published eBay offer. Listing ID: " + responseBody.get("listingId").asText());
-                    return true;
+                    return responseBody.get("listingId").asText();
                 }
             }
             System.err.println("Failed to publish eBay offer. Status: " + response.getStatusCode() + ", Body: " + response.getBody());
-            return false;
+            return null;
         } catch (Exception e) {
             System.err.println("Error publishing eBay offer: " + e.getMessage());
-            return false;
+            return null;
         }
     }
 
     /**
      * Helper to create HTTP headers with the Authorization token.
+     *
      * @return HttpHeaders with Authorization.
      */
     private HttpHeaders createAuthHeaders() {
