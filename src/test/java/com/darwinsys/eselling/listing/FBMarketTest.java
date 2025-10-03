@@ -36,6 +36,9 @@ public class FBMarketTest {
         var ret = new FBMarket().list(Set.of(item1, item2));
         System.out.println("testWarnings: ret = " + ret);
         assertEquals(FBMarket.location, ret.getLocation());
+		for (var m : ret.getMessages()) {
+			System.out.println("testWarnings: got warning: " + m);
+		}
         assertEquals(1, ret.getMessages().size());
     }
 }
