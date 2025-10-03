@@ -50,6 +50,7 @@ public class EBayMarket implements Market {
      * @return The ID of the created eBay listing (offer ID), or null if creation failed.
      */
     public ListResponse list(Item item) {
+        Objects.requireNonNull(item);
         try {
             String inventoryItemId;
 
