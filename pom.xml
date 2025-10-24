@@ -21,7 +21,7 @@
         <quarkus.platform.version>3.15.3</quarkus.platform.version>
         <vaadin.version>24.7.0</vaadin.version>
         <apache.poi.version>5.4.1</apache.poi.version>
-        <darwinsys-api.version>1.8.2</darwinsys-api.version>
+        <darwinsys-api.version>1.9.0-SNAPSHOT</darwinsys-api.version>
         <surefire-plugin.version>3.0.0</surefire-plugin.version>
 
     </properties>
