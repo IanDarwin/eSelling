@@ -6,8 +6,10 @@ import java.util.Collection;
 import java.util.Set;
 
 public interface Market<T> {
+    /// Before calling list()
     void startStream(String location);
-    ListResponse closeStream();
+
+
     ListResponse list(Item item);
     default ListResponse list(Collection<Item> items) {
         startStream("Unknown");
@@ -20,4 +22,10 @@ public interface Market<T> {
         closeStream();
         return listResponse;
     }
+
+    ///  After last list() call
+    ListResponse closeStream();
+
+    // A message to the user.
+    String getPostMessage();
 }

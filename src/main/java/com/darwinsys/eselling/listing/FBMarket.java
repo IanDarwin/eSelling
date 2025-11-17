@@ -31,8 +31,7 @@ public class FBMarket implements Market<Item> {
 
 	@Override
 	public void startStream(String location) {
-
-		warnings = new ArrayList<>();
+        warnings = new ArrayList<>();
 		numItems = rowNum = 0;
 
 		// Creating a Sheet from the workbench
@@ -148,4 +147,9 @@ public class FBMarket implements Market<Item> {
 			throw new RuntimeException("IO Error: " + ex, ex);
 		}
 	}
+
+    @Override
+    public String getPostMessage() {
+        return "Now send " + location + " to Facebook Market";
+    }
 }

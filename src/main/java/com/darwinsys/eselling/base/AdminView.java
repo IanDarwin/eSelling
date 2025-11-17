@@ -104,7 +104,7 @@ public class AdminView extends VerticalLayout {
         });
         Button listEBayButton = new Button("Export Selected to eBay (pre-Beta)");
         listEBayButton.addClickListener(event1 -> {
-                    ListResponse resp = prepareAndList(new EBayMarket("TEST_TOKEN"));
+                    ListResponse resp = prepareAndList(new EBayMarket());
                     if (resp.getSuccessCount() > 0) {
                         showMessageDialog("Uploaded to eBay!", resp.stringBuilder.toString());
                     }
