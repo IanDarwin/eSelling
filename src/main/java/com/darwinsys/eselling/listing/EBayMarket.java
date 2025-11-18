@@ -15,7 +15,7 @@ public class EBayMarket implements Market<Item> {
 	// XXX Should be parameterized, and last part sequenced/randomized?
 	public static final String location = "/home/ian/eSelling/eBayMarket.csv";
 
-    int count = 0;
+    Category category;
 
 	// Fields: id,ebayCat,title,price,description
 	public static final String PATTERN = """
@@ -42,18 +42,19 @@ and complete the draft to make it active at https://www.ebay.ca/sh/lst/drafts
 
     @Override
     public ListResponse list(Item item) {
-        if (count > 0) {
+        if (category == null) {
+			category = item.getCategory();
+		} else if (category != item.getCategory()) {
             var r = new ListResponse();
             r.setSuccessCount(0);
-            r.setMessages(List.of("EBayMarket Export: only do one item at a time, sorry"));
+            r.setMessages(List.of("EBayMarket Export: only do one category at a time, sorry"));
         }
 		String output = String.format(PATTERN, item.getId(),
                 ebayCategory(item.getCategory()), item.getName(),
                 item.getAskingPrice(), item.getDescription());
 System.out.println("DEBUG: " + output);
 		os.println(output);
-        ++count;
-		var r = new ListResponse();
+        var r = new ListResponse();
         r.setSuccessCount(1);
         return r;
 	}
@@ -72,7 +73,11 @@ System.out.println("DEBUG: " + output);
     }
 
 	private int ebayCategory(Category category) {
-		return -1;
+		for (Category c : CategoriesParser.getInstance().categories) {
+			if (c == category) {
+				return c.eBayCategory();
+			}
+		}
+		return -1;	// Expected to cause the upload to fail.
 	}
-
 }

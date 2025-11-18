@@ -1,5 +1,6 @@
 package com.darwinsys.eselling.base;
 
+import com.darwinsys.eselling.listing.CategoriesParser;
 import com.darwinsys.eselling.model.Category;
 import com.darwinsys.eselling.model.Item;
 import com.vaadin.flow.component.grid.Grid;
@@ -31,7 +32,7 @@ public class ListView extends VerticalLayout {
     private void initializeView() {
         removeAll();
         H1 header = new H1("Ian's Yard Sale Items");
-        var categories = Category.values();
+        var categories = CategoriesParser.getInstance().categories;
         HorizontalLayout topBox = new HorizontalLayout();
         topBox.setWrap(true);
         final Button all = new Button("All");

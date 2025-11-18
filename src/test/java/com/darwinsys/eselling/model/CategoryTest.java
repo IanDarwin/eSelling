@@ -2,17 +2,11 @@ package com.darwinsys.eselling.model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CategoryTest {
 
-    @Test
-    public void testSimpleNames() {
-        assertEquals("Antiques", Category.Antiques.toString());
-    }
-
-    @Test
-    public void testCamelCaseNames() {
-        assertEquals("Musical Instruments", Category.MusicalInstruments.toString());
-    }
+	public void testNotWritten() {
+		fail("No Category Tests written");
+	}
 }

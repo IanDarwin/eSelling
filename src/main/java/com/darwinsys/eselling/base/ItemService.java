@@ -34,7 +34,7 @@ public class ItemService implements Serializable {
     public List<Item> getItems(Category category) {
         final TypedQuery<Item> query = em.createQuery(
                 "SELECT i FROM Item i WHERE i.category = ?1 AND active IS true order by name", Item.class);
-        query.setParameter(1, category);
+        query.setParameter(1, category.toString());
         return query.getResultList();
     }
 

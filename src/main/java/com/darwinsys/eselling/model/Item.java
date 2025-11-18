@@ -1,5 +1,6 @@
 package com.darwinsys.eselling.model;
 
+import com.darwinsys.eselling.listing.CategoriesParser;
 import com.darwinsys.eselling.listing.MarketName;
 import jakarta.persistence.*;
 import org.wildfly.common.annotation.NotNull;
@@ -26,17 +27,13 @@ public class Item {
 	private Condition condition;
 	List<String> urls = new ArrayList<>();
 	private Double askingPrice = 0d;
-	@Enumerated(EnumType.STRING)
-	Category category;
+	@Column(name="category")
+    String categoryName;
+    @Transient
+    Category category;
     String conditionQualification;
     int quantity = 1;
     List<String> photos;
-
-	// Fields specific to EBAY
-	private String ebaySku; // Stores the eBay Inventory Item SKU
-	private String ebayOfferId; // Stores the eBay Offer ID
-	private String ebayListingId; // Stores the final eBay Listing ID (returned after publishing the offer)
-
 
 	@SuppressWarnings("unused") // JPA
     public Long getId() {
@@ -147,6 +144,19 @@ public class Item {
 		this.category = category;
 	}
 
+    public String getCategoryName() {
+        return category.name();
+    }
+    public void setCategoryName(String name) {
+        for (Category c : CategoriesParser.getInstance().categories) {
+            if (c.name().equals(name)) {
+                category = c;
+                return;
+            }
+        }
+        throw new IllegalArgumentException(String.format("Category %s not found"));
+    }
+
 	public String getConditionQualification() {
 		return conditionQualification;
 	}
@@ -176,29 +186,5 @@ public class Item {
     }
 	public void setActive(Boolean active) {
 		this.active = active;
-	}
-
-	public String getEbaySku() {
-		return ebaySku;
-	}
-
-	public void setEbaySku(String ebaySku) {
-		this.ebaySku = ebaySku;
-	}
-
-	public String getEbayOfferId() {
-		return ebayOfferId;
-	}
-
-	public void setEbayOfferId(String ebayOfferId) {
-		this.ebayOfferId = ebayOfferId;
-	}
-
-	public String getEbayListingId() {
-		return ebayListingId;
-	}
-
-	public void setEbayListingId(String ebayListingId) {
-		this.ebayListingId = ebayListingId;
 	}
 }

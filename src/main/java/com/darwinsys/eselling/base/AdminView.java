@@ -1,9 +1,6 @@
 package com.darwinsys.eselling.base;
 
-import com.darwinsys.eselling.listing.EBayMarket;
-import com.darwinsys.eselling.listing.FBMarket;
-import com.darwinsys.eselling.listing.ListResponse;
-import com.darwinsys.eselling.listing.Market;
+import com.darwinsys.eselling.listing.*;
 import com.darwinsys.eselling.model.Category;
 import com.darwinsys.eselling.model.Item;
 import com.vaadin.flow.component.button.Button;
@@ -123,7 +120,7 @@ public class AdminView extends VerticalLayout {
         conditionComboBox.setItems(Condition.values());
         conditionComboBox.setValue(Condition.USED);
 
-        categoryComboBox.setItems(Category.values()); // No default value
+        categoryComboBox.setItems(CategoriesParser.getInstance().categories); // No default value
 
         items = itemService.getAllItems();
         grid.setItems(items); // Use the stored items list

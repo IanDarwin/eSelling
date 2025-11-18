@@ -31,6 +31,10 @@ class MarketTest {
         public ListResponse list(Item item) {
             return null;
         }
+		@Override
+		public String getPostMessage() {
+			return "Ta ta for now!";
+		}
     }
 
     @Test
