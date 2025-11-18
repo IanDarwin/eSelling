@@ -1,0 +1,11 @@
+# Full name, FB Market name, eBay market category ID
+# Look up the eBay ones at 
+#	https://pages.ebay.com/sellerinformation/news/categorychanges.html
+# In the current dodgy implementation, you:
+#	CAN change any of the category values
+#	CAN NOT change the fullname field
+#	CAN NOT delete a no-longer-needed category
+# For any of the "can not" actions listed:
+#	Use your Database Admin interface, and
+#	IMMEDIATELY Update this file accordingly.
+My Nice Category,MyCat,55512

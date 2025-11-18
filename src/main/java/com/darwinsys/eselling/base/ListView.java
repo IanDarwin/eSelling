@@ -1,6 +1,6 @@
 package com.darwinsys.eselling.base;
 
-import com.darwinsys.eselling.listing.CategoriesParser;
+import com.darwinsys.eselling.io.CategoriesParser;
 import com.darwinsys.eselling.model.Category;
 import com.darwinsys.eselling.model.Item;
 import com.vaadin.flow.component.grid.Grid;
@@ -12,8 +12,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-
-import java.io.Serializable;
 
 
 @Route(value = "")

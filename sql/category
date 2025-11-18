@@ -1,0 +1,7 @@
+The Category mechanism evolved from a simple String to a relational.
+The table was created after the Category class:
+
+create table category(name varchar unique not null primary key, fbCategory varchar not null, eBayCategory integer default 0);
+alter table item add column category_id varchar;
+alter table item add foreign key (category_id) references category(name);
+alter table category owner to eselling;

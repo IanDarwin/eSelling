@@ -1,4 +1,4 @@
-package com.darwinsys.eselling.listing;
+package com.darwinsys.eselling.io;
 
 import com.darwinsys.eselling.model.Category;
 
@@ -41,6 +41,9 @@ public class CategoriesParser {
         categories = new ArrayList<>();
         String line;
         while ((line = br.readLine()) != null) {
+            if (line.startsWith("#")) {
+                continue;
+            }
            var raw = line.split(",");
            switch(raw.length) {
                case 2:
@@ -62,7 +65,7 @@ public class CategoriesParser {
         var ret = INSTANCE.parse(DEFAULT_CATEGORIES_FILE);
 
         for (Category c : ret) {
-            System.out.println("c = " + c);
+            System.out.println("category: " + c);
         }
     }
 

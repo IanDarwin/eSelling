@@ -20,3 +20,4 @@ drivers/
 error-screenshots/
 .mvn
 .env
+categories.csv

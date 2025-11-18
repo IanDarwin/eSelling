@@ -1,15 +1,12 @@
 package com.darwinsys.eselling.model;
 
-import com.darwinsys.eselling.listing.CategoriesParser;
+import com.darwinsys.eselling.io.CategoriesParser;
 import com.darwinsys.eselling.listing.MarketName;
 import jakarta.persistence.*;
 import org.wildfly.common.annotation.NotNull;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.darwinsys.eselling.model.Condition;
 
 @Entity
 public class Item {
@@ -27,9 +24,7 @@ public class Item {
 	private Condition condition;
 	List<String> urls = new ArrayList<>();
 	private Double askingPrice = 0d;
-	@Column(name="category")
-    String categoryName;
-    @Transient
+	@ManyToOne @JoinColumn(name = "category_id")
     Category category;
     String conditionQualification;
     int quantity = 1;
@@ -147,15 +142,6 @@ public class Item {
     public String getCategoryName() {
         return category.name();
     }
-    public void setCategoryName(String name) {
-        for (Category c : CategoriesParser.getInstance().categories) {
-            if (c.name().equals(name)) {
-                category = c;
-                return;
-            }
-        }
-        throw new IllegalArgumentException(String.format("Category %s not found"));
-    }
 
 	public String getConditionQualification() {
 		return conditionQualification;
@@ -187,4 +173,11 @@ public class Item {
 	public void setActive(Boolean active) {
 		this.active = active;
 	}
+
+    // Semi-boilerplate
+
+    @Override
+    public String toString() {
+        return "Item{'" + name + "'}";
+    }
 }

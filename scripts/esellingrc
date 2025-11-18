@@ -1,0 +1,16 @@
+#!/bin/ksh
+
+# Can't use javaPathHelper unless installed as package, sigh.
+JAVA=/usr/local/jdk-21/bin/java
+
+daemon="cd /home/ian/git-webs/eselling; $JAVA -jar target/quarkus-app/quarkus-run.jar >>/var/log/eselling.log"
+daemon_user="ian"
+
+. /etc/rc.d/rc.subr
+
+pexp=".*java -jar /home/ian/git-webs/eselling.*"
+rc_reload=NO
+rc_stop=NO
+rc_bg=YES
+
+rc_cmd $1

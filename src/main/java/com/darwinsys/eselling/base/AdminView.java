@@ -1,5 +1,6 @@
 package com.darwinsys.eselling.base;
 
+import com.darwinsys.eselling.io.CategoriesParser;
 import com.darwinsys.eselling.listing.*;
 import com.darwinsys.eselling.model.Category;
 import com.darwinsys.eselling.model.Item;
@@ -18,7 +19,6 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import jakarta.inject.Inject;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
@@ -99,13 +99,16 @@ public class AdminView extends VerticalLayout {
 				showMessageDialog("Saved to XLSX for upload",  resp.stringBuilder.toString());
             }
         });
-        Button listEBayButton = new Button("Export Selected to eBay (pre-Beta)");
+        Button listEBayButton = new Button("Export Selected to eBay");
         listEBayButton.addClickListener(event1 -> {
-                    ListResponse resp = prepareAndList(new EBayMarket());
-                    if (resp.getSuccessCount() > 0) {
-                        showMessageDialog("Uploaded to eBay!", resp.stringBuilder.toString());
-                    }
-                });
+            ListResponse resp = prepareAndList(new EBayMarket());
+            if (resp.getSuccessCount() > 0) {
+                resp.stringBuilder.append(". Now upload ").append(resp.getLocation())
+                        .append(" to ")
+                        .append("https://www.ebay.ca/sh/lst/drafts");
+                showMessageDialog("Saved for uploading to eBay!", resp.stringBuilder.toString());
+            }
+        });
         var bottomRow = new HorizontalLayout();
         bottomRow.add(addButton, listFBButton, listEBayButton);
         add(header, grid, bottomRow); // Add the button
@@ -122,7 +125,7 @@ public class AdminView extends VerticalLayout {
 
         categoryComboBox.setItems(CategoriesParser.getInstance().categories); // No default value
 
-        items = itemService.getAllItems();
+        items = itemService.getItems();
         grid.setItems(items); // Use the stored items list
         grid.setSelectionMode(Grid.SelectionMode.MULTI);
         grid.setColumns("name", "listed", "description", "category", "condition", "askingPrice");
@@ -167,6 +170,7 @@ public class AdminView extends VerticalLayout {
                 urlFields.get(i).setValue(value);
             }
             conditionComboBox.setValue(selectedItem.getCondition());
+            // System.out.printf("item %s category %s\n", selectedItem, selectedItem.getCategory());
             categoryComboBox.setValue(selectedItem.getCategory());
             askPriceField.setValue(selectedItem.getAskingPrice());
             active.setValue(selectedItem.getActive());
@@ -229,19 +233,19 @@ public class AdminView extends VerticalLayout {
         Double askPrice = askPriceField.getValue();
         if (name == null) {
             Notification.show("Short name is required");
-            return;
+            // return;
         }
         if (category == null) {
             Notification.show("A Category is required");
-            return;
+            // return;
         }
         if (description == null) {
             Notification.show("A description is required");
-            return;
+            // return;
         }
         if (askPrice == null) {
             Notification.show("Asking price is required");
-            return;
+            // return;
         }
         List<String> urls = new ArrayList<>();
         for (var tf : urlFields) {
