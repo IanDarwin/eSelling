@@ -25,7 +25,7 @@ public class ListResponse {
     }
 
     public ListResponse() {
-        this("Unknown", 0, Collections.emptyList());
+        this("Unknown", 0, List.of());
     }
 
     public String getLocation() {
