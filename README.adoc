@@ -33,9 +33,7 @@ To create a user manually:
 
 == TODO
 
-Use new ItemService instead of calling CSV parser!!
-
-Clean up error handling
+FB export - can only do one per web session; move init code to fix this.
 
 Handle validation properly as per https://vaadin.com/docs/latest/flow/binding-data/components-binder
 
