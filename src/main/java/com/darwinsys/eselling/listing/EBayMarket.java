@@ -21,16 +21,16 @@ public class EBayMarket implements Market<Item> {
 
 	public static final String uploadPageURL = "https://www.ebay.ca/sh/reports/uploads";
 
-	Category category;
+    /// eBay template-style upload puts category in header, so only 1 allowed(?)
+    /// This is used to enforce that.
+    Category category;
 
 	public static final String PATTERN_START = """
 #INFO,Version=0.0.2,Template= eBay-draft-listings-template_ENCA,,,,,,,,
-Action(SiteID=Canada|Country=CA|Currency=CAD|Version=1193|CC=UTF-8),Custom label (SKU),Category ID,Title,UPC,Price,Quantity,Item photo URL,Condition ID,Description,Format
-""";
+Action(SiteID=Canada|Country=CA|Currency=CAD|Version=1193|CC=UTF-8),Custom label (SKU),Category ID,Title,UPC,Price,Quantity,Item photo URL,Condition ID,Description,Format""";
 	// Fields: "Draft",id,ebayCat,title,pix,price,description,SaleType
 	public static final String PATTERN_ITEM = """
-Draft,%d,%d,%s,,%g,1,,USED,"%s",FixedPrice
-""";
+Draft,%d,%d,"%s",,%g,1,,USED,"%s",FixedPrice""";
 
 	static final String POST_MESSAGE = """
 Now upload this draft to the Seller Hub Reports tab
@@ -39,8 +39,23 @@ and complete the draft to make it active at
 
 	PrintWriter os;
 
-	@Override
-	public void startStream(String location) {
+    @Override
+    public String getFileLocation() {
+        return location;
+    }
+
+    @Override
+    public String getUploadURL() {
+        return uploadPageURL;
+    }
+
+    @Override
+    public MarketName getMarketName() {
+        return MarketName.eBay;
+    }
+
+    @Override @SuppressWarnings("unused")
+	public void startStream(String unusedLocation) {
 		try {
 			os = new PrintWriter(Files.newOutputStream(Path.of(location)));
 			os.println(PATTERN_START);

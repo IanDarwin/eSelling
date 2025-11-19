@@ -29,7 +29,22 @@ public class FBMarket implements Market<Item> {
 	int rowNum;
 	int numItems;
 
-	@Override
+    @Override
+    public String getFileLocation() {
+        return location;
+    }
+
+    @Override
+    public String getUploadURL() {
+        return "https://www.facebook.com/marketplace/create/bulk";
+    }
+
+    @Override
+    public MarketName getMarketName() {
+        return MarketName.FBMarket;
+    }
+
+    @Override
 	public void startStream(String location) {
         warnings = new ArrayList<>();
 		numItems = rowNum = 0;

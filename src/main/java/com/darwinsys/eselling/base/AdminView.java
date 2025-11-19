@@ -92,23 +92,11 @@ public class AdminView extends VerticalLayout {
         addButton.addClickListener(event1 -> showItemDialog());
         Button listFBButton = new Button("Export Selected to FB");
         listFBButton.addClickListener(event1 -> {
-            ListResponse resp = prepareAndList(fbMarket);
-            if (resp.getSuccessCount() > 0) {
-                resp.stringBuilder.append(". Now upload ").append(resp.getLocation())
-                        .append(" to ")
-                        .append("to https://www.facebook.com/marketplace/create/bulk");
-				showMessageDialog("Saved to XLSX for upload",  resp.stringBuilder.toString());
-            }
+            showUploadResult(prepareAndList(fbMarket), fbMarket);
         });
         Button listEBayButton = new Button("Export Selected to eBay");
         listEBayButton.addClickListener(event1 -> {
-            ListResponse resp = prepareAndList(eBayMarket);
-            if (resp.getSuccessCount() > 0) {
-                resp.stringBuilder.append(". Now upload ").append(resp.getLocation())
-                        .append(" to ")
-                        .append("https://www.ebay.ca/sh/lst/drafts");
-                showMessageDialog("Saved for uploading to eBay!", resp.stringBuilder.toString());
-            }
+            showUploadResult(prepareAndList(eBayMarket), eBayMarket);
         });
         var bottomRow = new HorizontalLayout();
         bottomRow.add(addButton, listFBButton, listEBayButton);
@@ -140,22 +128,31 @@ public class AdminView extends VerticalLayout {
         });
     }
 
+    /// Common code to show an upload result(s)
+    private void showUploadResult(ListResponse resp, Market market) {
+        if (resp.getSuccessCount() > 0) {
+            resp.stringBuilder
+                    .append(String.format(
+                            "Exported %d items with %d messages.\n",
+                            resp.getSuccessCount(), resp.getMessages().size()));
+            for (String s : resp.getMessages()) {
+                resp.stringBuilder.append("; ").append(s);
+            }
+            resp.stringBuilder
+                    .append("Now upload ").append(market.getFileLocation())
+                    .append(" to ")
+                    .append(market.getUploadURL());
+            showMessageDialog("Saved_for_upload", resp.stringBuilder.toString());
+        }
+    }
+
     private ListResponse prepareAndList(Market<?> market) {
         final Set<Item> selectedItems = grid.getSelectedItems();
-        var sb = new StringBuilder();
         if (selectedItems.isEmpty()) {
             showMessageDialog("Correct and resubmit", "No items selected!");
-            return new ListResponse(sb);
+            return new ListResponse();
         }
-        final ListResponse resp = market.list(selectedItems);
-        sb = resp.stringBuilder;
-        sb.append(
-                String.format("Saved %d Items with %d messages",
-                        resp.getSuccessCount(), resp.getMessages().size()));
-        for (String s : resp.getMessages()) {
-            sb.append("; ").append(s);
-        }
-        return resp;
+        return market.list(selectedItems);
     }
 
     private void showItemDialog() {
