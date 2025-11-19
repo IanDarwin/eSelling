@@ -18,6 +18,8 @@ public class EBayMarket implements Market<Item> {
 
 	// XXX Should be parameterized, and last part sequenced/randomized?
 	public static final String location = "/home/ian/eSelling/eBayMarket.csv";
+    
+    public static final String uploadPageURL = "https://www.ebay.ca/sh/reports/uploads";
 
     Category category;
 
@@ -30,8 +32,8 @@ Draft,%d,%d,%s,,%g,1,,USED,"%s",FixedPrice
 
 	static final String POST_MESSAGE = """
 Now upload this draft to the Seller Hub Reports tab
-and complete the draft to make it active at https://www.ebay.ca/sh/reports/uploads
-""";
+and complete the draft to make it active at 
+""" + uploadPageURL;
 
 	PrintWriter os;
 
@@ -51,7 +53,7 @@ and complete the draft to make it active at https://www.ebay.ca/sh/reports/uploa
 		} else if (!category.equals(item.getCategory())) {
             var r = new ListResponse();
             r.setSuccessCount(0);
-            r.setMessages(List.of("EBayMarket Export: only do one category at a time, sorry"));
+            r.setMessages(List.of("EBayMarket Export: can only do one category at a time, sorry"));
         }
 		String output = String.format(PATTERN, item.getId(),
                 ebayCategory(item.getCategory()), item.getName(),
