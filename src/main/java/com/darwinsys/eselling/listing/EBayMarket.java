@@ -14,19 +14,21 @@ import jakarta.inject.Inject;
 @ApplicationScoped
 public class EBayMarket implements Market<Item> {
 
-    @Inject CategoryService categoryService;
+	@Inject CategoryService categoryService;
 
 	// XXX Should be parameterized, and last part sequenced/randomized?
 	public static final String location = "/home/ian/eSelling/eBayMarket.csv";
-    
-    public static final String uploadPageURL = "https://www.ebay.ca/sh/reports/uploads";
 
-    Category category;
+	public static final String uploadPageURL = "https://www.ebay.ca/sh/reports/uploads";
 
-	// Fields: id,ebayCat,title,price,description
-	public static final String PATTERN = """
+	Category category;
+
+	public static final String PATTERN_START = """
 #INFO,Version=0.0.2,Template= eBay-draft-listings-template_ENCA,,,,,,,,
 Action(SiteID=Canada|Country=CA|Currency=CAD|Version=1193|CC=UTF-8),Custom label (SKU),Category ID,Title,UPC,Price,Quantity,Item photo URL,Condition ID,Description,Format
+""";
+	// Fields: "Draft",id,ebayCat,title,pix,price,description,SaleType
+	public static final String PATTERN_ITEM = """
 Draft,%d,%d,%s,,%g,1,,USED,"%s",FixedPrice
 """;
 
@@ -37,43 +39,46 @@ and complete the draft to make it active at
 
 	PrintWriter os;
 
-    @Override
-    public void startStream(String location) {
+	@Override
+	public void startStream(String location) {
 		try {
 			os = new PrintWriter(Files.newOutputStream(Path.of(location)));
+			os.println(PATTERN_START);
 		} catch (IOException ioe) {
 			throw new RuntimeException(ioe.toString(), ioe);
 		}
 	}
 
-    @Override
-    public ListResponse list(Item item) {
-        if (category == null) {
+	@Override
+	public ListResponse list(Item item) {
+		if (category == null) {
 			category = item.getCategory();
 		} else if (!category.equals(item.getCategory())) {
-            var r = new ListResponse();
-            r.setSuccessCount(0);
-            r.setMessages(List.of("EBayMarket Export: can only do one category at a time, sorry"));
-        }
-		String output = String.format(PATTERN, item.getId(),
-                ebayCategory(item.getCategory()), item.getName(),
-                item.getAskingPrice(), item.getDescription());
+			var r = new ListResponse();
+			r.setSuccessCount(0);
+			r.setMessages(List.of("EBayMarket Export: can only do one category at a time, sorry"));
+			return r;
+		}
+		String output = String.format(PATTERN_ITEM, item.getId(),
+				ebayCategory(item.getCategory()), item.getName(),
+				item.getAskingPrice(),
+				item.getDescription().replace('"', '\''));
 		System.out.println("DEBUG: " + output);
 		os.println(output);
 		return new ListResponse(location, 1, List.of());
 	}
 
-    @Override
-    public ListResponse closeStream() {
+	@Override
+	public ListResponse closeStream() {
 		os.close();
-        var r = new ListResponse(location, 1, List.of());
-        return r;
+		var r = new ListResponse(location, 1, List.of());
+		return r;
 	}
 
-    @Override
-    public String getPostMessage() {
-        return POST_MESSAGE;
-    }
+	@Override
+	public String getPostMessage() {
+		return POST_MESSAGE;
+	}
 
 	private int ebayCategory(Category category) {
 		for (Category c : categoryService.getCategories()) {
