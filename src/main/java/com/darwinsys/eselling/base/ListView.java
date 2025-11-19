@@ -1,6 +1,5 @@
 package com.darwinsys.eselling.base;
 
-import com.darwinsys.eselling.io.CategoriesParser;
 import com.darwinsys.eselling.model.Category;
 import com.darwinsys.eselling.model.Item;
 import com.vaadin.flow.component.grid.Grid;
@@ -15,12 +14,12 @@ import jakarta.inject.Named;
 
 
 @Route(value = "")
-@PageTitle("Ian's Yard Sale")
+@PageTitle("The Tiny Online Yard Sale")
 @SuppressWarnings("unused") // It really is used!
 public class ListView extends VerticalLayout {
     @Inject ItemService itemService;
+    @Inject CategoryService categoryService;
     private final Grid<Item> grid = new Grid<>(Item.class);
-
 
     public ListView(@Named("itemService") ItemService itemService) {
         this.itemService = itemService;
@@ -30,7 +29,7 @@ public class ListView extends VerticalLayout {
     private void initializeView() {
         removeAll();
         H1 header = new H1("Ian's Yard Sale Items");
-        var categories = CategoriesParser.getInstance().categories;
+        var categories = categoryService.getCategories();
         HorizontalLayout topBox = new HorizontalLayout();
         topBox.setWrap(true);
         final Button all = new Button("All");

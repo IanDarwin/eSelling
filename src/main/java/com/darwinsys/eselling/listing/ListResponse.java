@@ -1,6 +1,7 @@
 package com.darwinsys.eselling.listing;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ListResponse {
@@ -24,7 +25,7 @@ public class ListResponse {
     }
 
     public ListResponse() {
-        this("Unknown", 0, new ArrayList<String>());
+        this("Unknown", 0, Collections.emptyList());
     }
 
     public String getLocation() {

@@ -1,6 +1,5 @@
 package com.darwinsys.eselling.model;
 
-import com.darwinsys.eselling.io.CategoriesParser;
 import com.darwinsys.eselling.listing.MarketName;
 import jakarta.persistence.*;
 import org.wildfly.common.annotation.NotNull;

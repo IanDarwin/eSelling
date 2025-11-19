@@ -5,13 +5,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import com.darwinsys.eselling.io.CategoriesParser;
+import com.darwinsys.eselling.base.CategoryService;
 import com.darwinsys.eselling.model.Category;
 import com.darwinsys.eselling.model.Item;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 
 @ApplicationScoped
 public class EBayMarket implements Market<Item> {
+
+    @Inject CategoryService categoryService;
 
 	// XXX Should be parameterized, and last part sequenced/randomized?
 	public static final String location = "/home/ian/eSelling/eBayMarket.csv";
@@ -71,7 +74,7 @@ and complete the draft to make it active at https://www.ebay.ca/sh/reports/uploa
     }
 
 	private int ebayCategory(Category category) {
-		for (Category c : CategoriesParser.getInstance().categories) {
+		for (Category c : categoryService.getCategories()) {
 			if (c == category) {
 				return c.eBayCategory();
 			}

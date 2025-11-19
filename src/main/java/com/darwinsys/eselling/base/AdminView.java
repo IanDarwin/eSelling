@@ -1,6 +1,5 @@
 package com.darwinsys.eselling.base;
 
-import com.darwinsys.eselling.io.CategoriesParser;
 import com.darwinsys.eselling.listing.*;
 import com.darwinsys.eselling.model.Category;
 import com.darwinsys.eselling.model.Item;
@@ -33,9 +32,11 @@ import static com.darwinsys.eselling.model.Constants.sellSites;
 @SuppressWarnings("unused") // It really is used!
 public class AdminView extends VerticalLayout {
 
-    @Inject ItemService itemService;
     @Inject LoginService loginService;
+    @Inject ItemService itemService;
+    @Inject CategoryService categoryService;
     @Inject FBMarket fbMarket;
+    @Inject EBayMarket eBayMarket;
     private boolean isLoggedIn = false;
     private String loggedInUser = "";
     private final Grid<Item> grid = new Grid<>(Item.class);
@@ -91,7 +92,7 @@ public class AdminView extends VerticalLayout {
         addButton.addClickListener(event1 -> showItemDialog());
         Button listFBButton = new Button("Export Selected to FB");
         listFBButton.addClickListener(event1 -> {
-            ListResponse resp = prepareAndList(new FBMarket());
+            ListResponse resp = prepareAndList(fbMarket);
             if (resp.getSuccessCount() > 0) {
                 resp.stringBuilder.append(". Now upload ").append(resp.getLocation())
                         .append(" to ")
@@ -101,7 +102,7 @@ public class AdminView extends VerticalLayout {
         });
         Button listEBayButton = new Button("Export Selected to eBay");
         listEBayButton.addClickListener(event1 -> {
-            ListResponse resp = prepareAndList(new EBayMarket());
+            ListResponse resp = prepareAndList(eBayMarket);
             if (resp.getSuccessCount() > 0) {
                 resp.stringBuilder.append(". Now upload ").append(resp.getLocation())
                         .append(" to ")
@@ -123,7 +124,7 @@ public class AdminView extends VerticalLayout {
         conditionComboBox.setItems(Condition.values());
         conditionComboBox.setValue(Condition.USED);
 
-        categoryComboBox.setItems(CategoriesParser.getInstance().categories); // No default value
+        categoryComboBox.setItems(categoryService.getCategories());
 
         items = itemService.getItems();
         grid.setItems(items); // Use the stored items list
@@ -139,7 +140,7 @@ public class AdminView extends VerticalLayout {
         });
     }
 
-    private ListResponse prepareAndList(Market market) {
+    private ListResponse prepareAndList(Market<?> market) {
         final Set<Item> selectedItems = grid.getSelectedItems();
         var sb = new StringBuilder();
         if (selectedItems.isEmpty()) {
@@ -150,7 +151,7 @@ public class AdminView extends VerticalLayout {
         sb = resp.stringBuilder;
         sb.append(
                 String.format("Saved %d Items with %d messages",
-                        Integer.valueOf(resp.getSuccessCount()), resp.getMessages().size()));
+                        resp.getSuccessCount(), resp.getMessages().size()));
         for (String s : resp.getMessages()) {
             sb.append("; ").append(s);
         }
@@ -271,7 +272,6 @@ public class AdminView extends VerticalLayout {
     }
 
     /** For use as a Binder validator in the URL fields */
-    public static Predicate<String> urlFieldValidator = s -> {
-        return s.isEmpty() || s.startsWith("https://") || s.startsWith("http://");
-    };
+    public static Predicate<String> urlFieldValidator =
+            s -> s.isEmpty() || s.startsWith("https://") || s.startsWith("http://");
 }

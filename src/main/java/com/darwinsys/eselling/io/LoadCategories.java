@@ -11,7 +11,7 @@ import java.sql.SQLException;
 
 public class LoadCategories {
     public static void main(String[] args) throws SQLException {
-        // process();
+        process();
     }
 
     public static void process() throws SQLException {
