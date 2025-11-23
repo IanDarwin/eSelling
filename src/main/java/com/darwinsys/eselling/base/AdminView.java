@@ -37,6 +37,7 @@ public class AdminView extends VerticalLayout {
     @Inject CategoryService categoryService;
     @Inject FBMarket fbMarket;
     @Inject EBayMarket eBayMarket;
+    @Inject KijijiMarket kijijiMarket;
     private boolean isLoggedIn = false;
     private String loggedInUser = "";
     private final Grid<Item> grid = new Grid<>(Item.class);
@@ -98,8 +99,12 @@ public class AdminView extends VerticalLayout {
         listEBayButton.addClickListener(event1 -> {
             showUploadResult(prepareAndList(eBayMarket), eBayMarket);
         });
+        Button listKijijiButton = new Button("Export Selected to Kijiji");
+        listKijijiButton.addClickListener(event1 -> {
+            showUploadResult(prepareAndList(kijijiMarket), kijijiMarket);
+        });
         var bottomRow = new HorizontalLayout();
-        bottomRow.add(addButton, listFBButton, listEBayButton);
+        bottomRow.add(addButton, listFBButton, listEBayButton, listKijijiButton);
         add(header, grid, bottomRow); // Add the button
         setSizeFull();
         grid.setSizeFull();

@@ -27,7 +27,7 @@ public class Item {
     Category category;
     String conditionQualification;
     int quantity = 1;
-    List<String> photos;
+    String photosDir;
 
 	@SuppressWarnings("unused") // JPA
     public Long getId() {
@@ -158,12 +158,12 @@ public class Item {
 		this.quantity = quantity;
 	}
 
-	public List<String> getPhotos() {
-		return photos;
+	public String getPhotosDir() {
+		return photosDir;
 	}
 
-	public void setPhotos(List<String> photos) {
-		this.photos = photos;
+	public void setPhotosDir(String photosDir) {
+		this.photosDir = photosDir;
 	}
 
     public Boolean getActive() {
@@ -178,5 +178,13 @@ public class Item {
     @Override
     public String toString() {
         return "Item{'" + name + "'}";
+    }
+
+    public long getKijijiCategoryId() {
+        return 123456;
+    }
+
+    public String getTags() {
+        return "TAGS??"; // XXX add to item and database
     }
 }
