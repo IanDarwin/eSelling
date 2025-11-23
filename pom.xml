@@ -94,6 +94,23 @@
 			<version>6.1.8</version>
 		</dependency>
 
+		<!-- Kijiji is a pain in the ass to upload, so we
+		 *** have to use Selenium and drive the browser
+		 *** pretending to be a fast typist.
+		 -->
+		<!-- Selenium for browser automation -->
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-java</artifactId>
+			<version>4.16.1</version>
+		</dependency>
+		<!-- WebDriverManager (Automatically handles downloading ChromeDriver) -->
+		<dependency>
+			<groupId>io.github.bonigarcia</groupId>
+			<artifactId>webdrivermanager</artifactId>
+			<version>5.6.2</version>
+		</dependency>
+
 		<!-- Logging -->
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
@@ -105,8 +122,8 @@
 
     <build>
         <defaultGoal>package quarkus:dev</defaultGoal>
-        <plugins>
-            <plugin>
+		<plugins>
+			<plugin>
                 <groupId>io.quarkus.platform</groupId>
                 <artifactId>quarkus-maven-plugin</artifactId>
                 <version>${quarkus.platform.version}</version>
