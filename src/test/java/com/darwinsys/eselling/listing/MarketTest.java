@@ -17,6 +17,22 @@ class MarketTest {
 
     class MockMarket implements Market {
         String location;
+
+        @Override
+        public String getFileLocation() {
+            return "";
+        }
+
+        @Override
+        public String getUploadURL() {
+            return "";
+        }
+
+        @Override
+		public MarketName getMarketName() {
+			return MarketName.Other;
+		}
+
         @Override
         public void startStream(String location) {
             this.location = location;
