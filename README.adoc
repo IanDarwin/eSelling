@@ -35,11 +35,14 @@ To create a user manually:
 
 FB export - can only do one per web session; move init code to fix this.
 
+Each export should add its listing URL to the DB if possible.
+
 Handle validation properly as per https://vaadin.com/docs/latest/flow/binding-data/components-binder
+
+Exports should upload photos from photosDir - scp -r photosDir dos:/www/tmp
 
 Add fields:
 	Manufacturer's URL?
-	Photos!?
 
 === Longer-term:
 
