@@ -195,8 +195,17 @@ public class Item {
 
 	// Semi-boilerplate
 
-	@Override
-	public String toString() {
-		return "Item{'" + name + "'}";
-	}
+    @Override
+    public String toString() {
+        return "Item{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", condition=" + condition +
+                ", askingPrice=" + askingPrice +
+                ", category=" + category +
+                ", photosDir='" + photosDir + '\'' +
+                ", tags='" + tags + '\'' +
+                '}';
+    }
 }

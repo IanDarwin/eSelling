@@ -103,6 +103,7 @@ public class AdminView extends VerticalLayout {
         });
         Button listKijijiButton = new Button("Export Selected to Kijiji");
         listKijijiButton.addClickListener(event1 -> {
+            System.out.println("export::button: item = " + selectedItem);
             showUploadResult(prepareAndList(kijijiMarket), kijijiMarket);
         });
         var bottomRow = new HorizontalLayout();
@@ -168,26 +169,32 @@ public class AdminView extends VerticalLayout {
 
         // Populate fields if editing an existing item
         if (selectedItem != null) {
+            System.out.println("showItemDialog: item  = " + selectedItem);
             nameField.setValue(selectedItem.getName());
             descriptionField.setValue(selectedItem.getDescription());
+            photosDirField.setValue(selectedItem.getPhotosDir().isEmpty()?"":selectedItem.getPhotosDir());
+            tagsField.setValue(selectedItem.getTags().isEmpty()?"":selectedItem.getTags());
+            askPriceField.setValue(selectedItem.getAskingPrice());
+            conditionComboBox.setValue(selectedItem.getCondition());
+            categoryComboBox.setValue(selectedItem.getCategory());
             for (int i = 0; i < urlFields.size(); i++) {
                 String value = selectedItem.getUrls().get(i);
                 urlFields.get(i).setValue(value);
             }
-            conditionComboBox.setValue(selectedItem.getCondition());
             // System.out.printf("item %s category %s\n", selectedItem, selectedItem.getCategory());
-            categoryComboBox.setValue(selectedItem.getCategory());
-            askPriceField.setValue(selectedItem.getAskingPrice());
             active.setValue(selectedItem.getActive());
         } else {
             // Clear fields from previous use if creating a new item
             nameField.clear();
             descriptionField.clear();
+            photosDirField.clear();
+            tagsField.clear();
+            askPriceField.clear();
+            //categoryComboBox.setValue(Category.getDefault());
+            conditionComboBox.setValue(Condition.getDefault());
             for (var tf : urlFields) {
                 tf.setValue("");
             }
-            conditionComboBox.setValue(Condition.getDefault());
-            askPriceField.clear();
             active.setValue(true);
         }
 
@@ -232,23 +239,19 @@ public class AdminView extends VerticalLayout {
     }
 
     private void saveItem() {
-        String name = nameField.getValue();
-        String description = descriptionField.getValue();
-        Category category = categoryComboBox.getValue();
-        Double askPrice = askPriceField.getValue();
-        if (name == null) {
+        if (nameField.getValue() == null) {
             Notification.show("Short name is required");
             // return;
         }
-        if (category == null) {
+        if (categoryComboBox.getValue() == null) {
             Notification.show("A Category is required");
             // return;
         }
-        if (description == null) {
+        if (descriptionField.getValue() == null) {
             Notification.show("A description is required");
             // return;
         }
-        if (askPrice == null) {
+        if (askPriceField.getValue() == null) {
             Notification.show("Asking price is required");
             // return;
         }
