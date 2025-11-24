@@ -45,6 +45,10 @@ public class Category {
         return eBayCategory;
     }
 
+    public int kijijiCategory() {
+        return kijijiCategory;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this) return true;

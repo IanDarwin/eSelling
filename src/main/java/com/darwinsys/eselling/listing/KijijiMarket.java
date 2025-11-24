@@ -22,7 +22,6 @@ public class KijijiMarket implements Market<Item> {
 
     static String userHome = System.getProperty("user.home");
 
-
     @Override
     public String getFileLocation() {
         return "";
@@ -76,7 +75,7 @@ public class KijijiMarket implements Market<Item> {
 
         try {
             // 2. Navigate to URL
-            String url = "https://www.kijiji.ca/p-post-ad.html?categoryId=" + item.getKijijiCategoryId();
+            String url = "https://www.kijiji.ca/p-post-ad.html?categoryId=" + item.getCategory().kijijiCategory();
             System.out.println("Navigating to: " + url);
             driver.get(url);
 

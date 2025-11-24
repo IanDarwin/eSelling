@@ -180,10 +180,6 @@ public class Item {
         return "Item{'" + name + "'}";
     }
 
-    public long getKijijiCategoryId() {
-        return 123456;
-    }
-
     public String getTags() {
         return "TAGS??"; // XXX add to item and database
     }
