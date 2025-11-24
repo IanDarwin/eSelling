@@ -171,6 +171,17 @@ public class Item {
 		return tags;
 	}
 
+    public String[] getTagsAsArray() {
+        if (tags.isEmpty()) {
+            return new String[0];
+        }
+        String[] ret = tags.split(",");
+        for (int i = 0; i < ret.length; i++) {
+            ret[i] = ret[i].trim();
+        }
+        return ret;
+    }
+
 	public void setTags(String tags) {
 		this.tags = tags;
 	}
