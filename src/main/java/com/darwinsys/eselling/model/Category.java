@@ -2,7 +2,6 @@ package com.darwinsys.eselling.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
 import java.util.Collection;
@@ -14,13 +13,15 @@ public class Category {
     private String name;
     private String fbCategory;
     private int eBayCategory;
+    private int kijijiCategory;
     @OneToMany
     Collection<Item> items;
 
-    public Category(String name, String fbCategory, int eBayCategory) {
+    public Category(String name, String fbCategory, int eBayCategory, int kijijiCategory) {
         this.name = name;
         this.fbCategory = fbCategory;
         this.eBayCategory = eBayCategory;
+        this.kijijiCategory = kijijiCategory;
     }
 
     public Category() {
