@@ -45,6 +45,8 @@ public class AdminView extends VerticalLayout {
     private final TextField nameField = new TextField("Name");
     private final TextArea descriptionField = new TextArea("Description");
     private final NumberField askPriceField = new NumberField("Asking Price");
+    private final TextField photosDirField = new TextField("Photos Dir");
+    private final TextField tagsField = new TextField("Keyword Tags");
     private final ComboBox<Condition> conditionComboBox = new ComboBox<>("Condition:");
     private final ComboBox<Category> categoryComboBox = new ComboBox<>("Category");
     Checkbox active = new Checkbox("Active?");
@@ -205,14 +207,14 @@ public class AdminView extends VerticalLayout {
             selectedItem = null;
         });
 
+		// Now add everything to the form, in order
         formLayout.add(nameField, descriptionField);
+        formLayout.add(photosDirField, tagsField);
+        formLayout.add(askPriceField, conditionComboBox, categoryComboBox);
         for (TextField tf : urlFields) {
             formLayout.add(tf);
         }
-
-        formLayout.add(askPriceField, conditionComboBox, categoryComboBox);
 		formLayout.add(active);
-
         var bottomRow = new HorizontalLayout();
         bottomRow.add(saveButton, cancelButton);
         formLayout.add(bottomRow);
@@ -250,6 +252,7 @@ public class AdminView extends VerticalLayout {
             Notification.show("Asking price is required");
             // return;
         }
+
         List<String> urls = new ArrayList<>();
         for (var tf : urlFields) {
             urls.add(tf.getValue());
@@ -258,6 +261,8 @@ public class AdminView extends VerticalLayout {
         if (selectedItem != null) { // Update existing item
             selectedItem.setName(name);
             selectedItem.setDescription(description);
+            selectedItem.setPhotosDir(photosDirField.getValue());
+            selectedItem.setTags(tagsField.getValue());
             selectedItem.setUrls(urls);
             selectedItem.setCondition(conditionComboBox.getValue());
             selectedItem.setCategory(categoryComboBox.getValue());

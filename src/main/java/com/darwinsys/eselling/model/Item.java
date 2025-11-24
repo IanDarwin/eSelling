@@ -24,13 +24,14 @@ public class Item {
 	List<String> urls = new ArrayList<>();
 	private Double askingPrice = 0d;
 	@ManyToOne @JoinColumn(name = "category_id")
-    Category category;
-    String conditionQualification;
-    int quantity = 1;
-    String photosDir;
+	Category category;
+	String conditionQualification;
+	int quantity = 1;
+	String photosDir;
+	String tags;	// a.k.a. keywords
 
 	@SuppressWarnings("unused") // JPA
-    public Long getId() {
+	public Long getId() {
 		return id;
 	}
 	@SuppressWarnings("unused") // JPA
@@ -128,7 +129,7 @@ public class Item {
 	}
 	public void setUrls(List<String> urls) {
 		this.urls = urls;
-    }
+	}
 
 	public Category getCategory() {
 		return category;
@@ -138,9 +139,9 @@ public class Item {
 		this.category = category;
 	}
 
-    public String getCategoryName() {
-        return category.name();
-    }
+	public String getCategoryName() {
+		return category.name();
+	}
 
 	public String getConditionQualification() {
 		return conditionQualification;
@@ -166,21 +167,25 @@ public class Item {
 		this.photosDir = photosDir;
 	}
 
-    public Boolean getActive() {
+	public String getTags() {
+		return tags;
+	}
+
+	public void setTags(String tags) {
+		this.tags = tags;
+	}
+
+	public Boolean getActive() {
 		return active;
-    }
+	}
 	public void setActive(Boolean active) {
 		this.active = active;
 	}
 
-    // Semi-boilerplate
+	// Semi-boilerplate
 
-    @Override
-    public String toString() {
-        return "Item{'" + name + "'}";
-    }
-
-    public String getTags() {
-        return "TAGS??"; // XXX add to item and database
-    }
+	@Override
+	public String toString() {
+		return "Item{'" + name + "'}";
+	}
 }
