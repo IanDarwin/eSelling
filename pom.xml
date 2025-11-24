@@ -46,6 +46,14 @@
     </dependencyManagement>
 
     <dependencies>
+
+		<!-- List ahead of whatever's using it, to get version for java 25 & 26 -->
+		<dependency>
+			<groupId>net.bytebuddy</groupId>
+			<artifactId>byte-buddy</artifactId>
+			<version>1.17.0</version>
+		</dependency>
+
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-quarkus-extension</artifactId>
