@@ -253,29 +253,30 @@ public class AdminView extends VerticalLayout {
             // return;
         }
 
+        if (selectedItem != null) { // Update existing item
+            populateItemFromFields(selectedItem);
+        } else { // Create a new item
+            Item newItem = new Item();
+            populateItemFromFields(newItem);
+            items.add(newItem);
+            grid.setItems(items);
+        }
+    }
+
+    private void populateItemFromFields(Item item) {
+        item.setName(nameField.getValue());
+        item.setDescription(descriptionField.getValue());
+        item.setPhotosDir(photosDirField.getValue());
+        item.setTags(tagsField.getValue());
         List<String> urls = new ArrayList<>();
         for (var tf : urlFields) {
             urls.add(tf.getValue());
         }
-
-        if (selectedItem != null) { // Update existing item
-            selectedItem.setName(name);
-            selectedItem.setDescription(description);
-            selectedItem.setPhotosDir(photosDirField.getValue());
-            selectedItem.setTags(tagsField.getValue());
-            selectedItem.setUrls(urls);
-            selectedItem.setCondition(conditionComboBox.getValue());
-            selectedItem.setCategory(categoryComboBox.getValue());
-            selectedItem.setAskingPrice(askPrice);
-            itemService.updateItem(selectedItem);
-        } else { // Create a new item
-            Item newItem = new Item(0L, name, description, urls,
-                    askPrice);
-            newItem.setCondition(Condition.getDefault());
-            items.add(newItem);
-            grid.setItems(items);
-            itemService.createItem(newItem);// Refresh the grid
-        }
+        item.setUrls(urls);
+        item.setCondition(conditionComboBox.getValue());
+        item.setCategory(categoryComboBox.getValue());
+        item.setAskingPrice(askPriceField.getValue());
+        itemService.updateItem(item);
     }
 
     /** For use as a Binder validator in the URL fields */
