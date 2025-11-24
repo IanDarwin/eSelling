@@ -46,11 +46,11 @@ public class CategoriesParser {
             }
            var raw = line.split(",");
            switch(raw.length) {
-               case 2:
-                   categories.add(new Category(raw[0], raw[1], -1));
-                   break;
                case 3:
-                   categories.add(new Category(raw[0], raw[1], Integer.parseInt(raw[2])));
+                   categories.add(new Category(raw[0], raw[1], -1, -1));
+                   break;
+               case 4:
+                   categories.add(new Category(raw[0], raw[1], Integer.parseInt(raw[2]), Integer.parseInt(raw[3])));
                    break;
                default:
                    throw new IllegalArgumentException("Line " + line + " invalid, ncols " + raw.length);
