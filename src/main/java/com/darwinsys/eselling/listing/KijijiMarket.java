@@ -10,6 +10,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
 import java.time.Duration;
+import java.util.Collection;
+import java.util.List;
 import java.util.Scanner;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -50,6 +52,18 @@ public class KijijiMarket implements Market<Item> {
     @Override
     public String getPostMessage() {
         return "Review the browser screen and press Submit";
+    }
+
+    @Override
+    public ListResponse list(Collection<Item> items) {
+        switch (items.size()) {
+            case 0:
+                return new ListResponse();
+            case 1:
+                return list(((List<Item>) items).get(0));
+            default:
+                throw new IllegalArgumentException("Kijiji is interactive, can only handle one");
+        }
     }
 
     @Override
