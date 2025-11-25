@@ -172,8 +172,10 @@ public class AdminView extends VerticalLayout {
             System.out.println("showItemDialog: item  = " + selectedItem);
             nameField.setValue(selectedItem.getName());
             descriptionField.setValue(selectedItem.getDescription());
-            photosDirField.setValue(selectedItem.getPhotosDir().isEmpty()?"":selectedItem.getPhotosDir());
-            tagsField.setValue(selectedItem.getTags().isEmpty()?"":selectedItem.getTags());
+            var pd = selectedItem.getPhotosDir();
+            photosDirField.setValue((pd == null || pd.isEmpty())?"":selectedItem.getPhotosDir());
+            var tags = selectedItem.getTags();
+            tagsField.setValue((tags == null || tags.isEmpty())?"":selectedItem.getTags());
             askPriceField.setValue(selectedItem.getAskingPrice());
             conditionComboBox.setValue(selectedItem.getCondition());
             categoryComboBox.setValue(selectedItem.getCategory());
@@ -181,7 +183,7 @@ public class AdminView extends VerticalLayout {
                 String value = selectedItem.getUrls().get(i);
                 urlFields.get(i).setValue(value);
             }
-            // System.out.printf("item %s category %s\n", selectedItem, selectedItem.getCategory());
+            // System.out.println(selectedItem);
             active.setValue(selectedItem.getActive());
         } else {
             // Clear fields from previous use if creating a new item
