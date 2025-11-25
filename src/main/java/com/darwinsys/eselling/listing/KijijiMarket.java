@@ -55,18 +55,6 @@ public class KijijiMarket implements Market<Item> {
     }
 
     @Override
-    public ListResponse list(Collection<Item> items) {
-        switch (items.size()) {
-            case 0:
-                return new ListResponse();
-            case 1:
-                return list(((List<Item>) items).get(0));
-            default:
-                throw new IllegalArgumentException("Kijiji is interactive, can only handle one");
-        }
-    }
-
-    @Override
     public ListResponse list(Item item) {
 
         // Setup ChromeDriver automatically
