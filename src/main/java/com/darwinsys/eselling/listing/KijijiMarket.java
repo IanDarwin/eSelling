@@ -70,7 +70,7 @@ public class KijijiMarket implements Market<Item> {
         File profileDir = new File(userHome, ".eselling/chrome-profile");
         options.addArguments("user-data-dir=" + profileDir.getAbsolutePath());
         // Keep browser open after script finishes so we can click "Post"
-        options.setExperimentalOption("detach", true);
+        options.setExperimentalOption("detach", Boolean.TRUE);
 
         WebDriver driver = new ChromeDriver(options);
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
