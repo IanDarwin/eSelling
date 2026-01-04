@@ -5,6 +5,6 @@ import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.theme.Theme;
 
 @Theme("starter-theme")
-@PWA(name = "eSales", shortName = "eSales")
+@PWA(name = "eSelling", shortName = "eSelling")
 public class AppConfig implements AppShellConfigurator {
 }
