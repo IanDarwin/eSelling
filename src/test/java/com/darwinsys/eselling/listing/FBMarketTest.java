@@ -39,6 +39,6 @@ public class FBMarketTest {
 		for (var m : ret.getMessages()) {
 			System.out.println("testWarnings: got warning: " + m);
 		}
-        assertEquals(1, ret.getMessages().size());
+        assertEquals(2, ret.getMessages().size());
     }
 }

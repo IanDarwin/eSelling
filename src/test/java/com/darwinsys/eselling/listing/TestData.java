@@ -1,5 +1,6 @@
 package com.darwinsys.eselling.listing;
 
+import com.darwinsys.eselling.model.Category;
 import com.darwinsys.eselling.model.Condition;
 import com.darwinsys.eselling.model.Item;
 
@@ -12,6 +13,7 @@ public class TestData {
                 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.""");
         item1.setAskingPrice(42d);
         item1.setCondition(Condition.USED);
+        item1.setCategory(Category.getDefault());
         return item1;
     }
 
@@ -22,6 +24,7 @@ public class TestData {
 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.""");
         item2.setAskingPrice(42d);
         item2.setCondition(Condition.USED);
+        item2.setCategory(Category.getDefault());
         item2.getUrls().set(2, "Non-empty string for test");
         return item2;
     }
