@@ -9,20 +9,27 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.enterprise.inject.spi.CDI;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import org.springframework.web.client.RestClient;
 
 
 @Route(value = "")
 @PageTitle("The Tiny Online Yard Sale")
+@RequestScoped
 @SuppressWarnings("unused") // It really is used!
 public class ListView extends VerticalLayout {
-    @Inject ItemService itemService;
-    @Inject CategoryService categoryService;
+    ItemService itemService;
+    CategoryService categoryService;
     private final Grid<Item> grid = new Grid<>(Item.class);
 
-    public ListView(@Named("itemService") ItemService itemService) {
+    public ListView(@Named("itemService") ItemService itemService,
+                    @Named("categoryService")CategoryService categoryService) {
         this.itemService = itemService;
+        this.categoryService = categoryService;
         initializeView();
     }
 
