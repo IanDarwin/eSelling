@@ -28,6 +28,10 @@ public class Category {
         // Empty, just for JPA
     }
 
+	public static Category getDefault() {
+		return new Category("DEFAULT", "DEFAULT", 1, 1);
+	}
+
     @Override
     public String toString() {
         return name;
