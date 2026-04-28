@@ -21,3 +21,6 @@ error-screenshots/
 .mvn
 .env
 categories.csv
+package-lock.json
+package.json
+tsconfig.json
