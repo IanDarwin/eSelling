@@ -3,4 +3,4 @@
 set -x
 
 withjava 21 \
-mvn quarkus:dev
+mvn clean quarkus:dev
