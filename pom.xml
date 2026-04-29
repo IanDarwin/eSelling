@@ -18,11 +18,11 @@
         <maven.compiler.parameters>true</maven.compiler.parameters>
         <failOnMissingWebXml>false</failOnMissingWebXml>
 
-        <quarkus.platform.version>3.15.3</quarkus.platform.version>
-        <vaadin.version>24.7.0</vaadin.version>
-        <apache.poi.version>5.4.1</apache.poi.version>
+        <quarkus.platform.version>3.35.0.CR1</quarkus.platform.version>
+        <vaadin.version>25.1.3</vaadin.version>
+        <apache.poi.version>5.5.1</apache.poi.version>
         <darwinsys-api.version>1.9.0-SNAPSHOT</darwinsys-api.version>
-        <surefire-plugin.version>3.0.0</surefire-plugin.version>
+        <surefire-plugin.version>3.5.5</surefire-plugin.version>
 
     </properties>
 
@@ -47,11 +47,11 @@
 
     <dependencies>
 
-		<!-- List ahead of whatever's using it, to get version for java 25 & 26 -->
+		<!-- Put this ahead of whatever's using it, to get version for java 25 & 26 -->
 		<dependency>
 			<groupId>net.bytebuddy</groupId>
 			<artifactId>byte-buddy</artifactId>
-			<version>1.18.3</version>
+			<version>1.18.8-jdk5</version>
 		</dependency>
 
         <dependency>
@@ -94,12 +94,12 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
-			<version>7.0.2</version>
+			<version>7.0.7</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
-			<version>7.0.2</version>
+			<version>7.0.7</version>
 		</dependency>
 
 		<!-- Kijiji is a pain in the ass to upload, so we
@@ -110,13 +110,13 @@
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-java</artifactId>
-			<version>4.39.0</version>
+			<version>4.43.0</version>
 		</dependency>
 		<!-- WebDriverManager (Automatically handles downloading ChromeDriver) -->
 		<dependency>
 			<groupId>io.github.bonigarcia</groupId>
 			<artifactId>webdrivermanager</artifactId>
-			<version>6.3.3</version>
+			<version>6.3.4</version>
 		</dependency>
 
 		<!-- Logging -->
