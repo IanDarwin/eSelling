@@ -1,0 +1,52 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'com.darwinsys.eselling'
+version = '1.0-SNAPSHOT'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // JPA / Hibernate
+    implementation 'org.hibernate.orm:hibernate-core:6.4.4.Final'
+
+	// DarwinSys API
+	implementation 'com.darwinsys:darwinsys-api:1.8.0'
+
+    // H2 embedded database (swap for your real DB driver)
+    runtimeOnly 'com.h2database:h2:2.2.224'
+
+    // Jakarta Persistence API
+    implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
+
+	// Web Driver for tricky exporting via web app
+	implementation 'org.seleniumhq.selenium:selenium-java:4.43.0'
+	implementation 'io.github.bonigarcia:webdrivermanager:6.3.4'
+
+    // SLF4J for Hibernate logging
+    runtimeOnly 'org.slf4j:slf4j-simple:2.0.12'
+
+	// Apache POI for spreadsheet export
+	implementation 'org.apache.poi:poi:5.5.1'
+}
+
+application {
+    mainClass = 'com.darwinsys.eselling.admin.ItemAdminApp'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.darwinsys.eselling.admin.ItemAdminApp'
+    }
+    from configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}

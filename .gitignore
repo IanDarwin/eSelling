@@ -24,3 +24,6 @@ categories.csv
 package-lock.json
 package.json
 tsconfig.json
+build
+.gradle
+gradle

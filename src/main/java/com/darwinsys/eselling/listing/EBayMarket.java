@@ -5,16 +5,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import com.darwinsys.eselling.base.CategoryService;
+import com.darwinsys.eselling.admin.CategoryService;
 import com.darwinsys.eselling.model.Category;
 import com.darwinsys.eselling.model.Item;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 
-@ApplicationScoped
+// @ApplicationScoped
 public class EBayMarket implements Market<Item> {
 
-	@Inject CategoryService categoryService;
+	//@Inject
+	CategoryService categoryService = new CategoryService();
 
 	// XXX Should be parameterized, and last part sequenced/randomized?
 	public static final String location = "/home/ian/eSelling/eBayMarket.csv";
@@ -34,8 +33,8 @@ Draft,%d,%d,"%s",,%g,1,,USED,"%s",FixedPrice""";
 
 	static final String POST_MESSAGE = """
 Now upload this draft to the Seller Hub Reports tab
-and complete the draft to make it active at 
-""" + uploadPageURL;
+and complete the draft to make it active at
+""" + " " + uploadPageURL;
 
 	PrintWriter os;
 
@@ -86,8 +85,7 @@ and complete the draft to make it active at
 	@Override
 	public ListResponse closeStream() {
 		os.close();
-		var r = new ListResponse(location, 1, List.of());
-		return r;
+        return new ListResponse(location, 1, List.of());
 	}
 
 	@Override
@@ -96,7 +94,7 @@ and complete the draft to make it active at
 	}
 
 	private int ebayCategory(Category category) {
-		for (Category c : categoryService.getCategories()) {
+		for (Category c : categoryService.findAllCategories()) {
 			if (c == category) {
 				return c.eBayCategory();
 			}

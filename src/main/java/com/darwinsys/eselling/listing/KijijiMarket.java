@@ -14,12 +14,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Scanner;
 
-import jakarta.enterprise.context.ApplicationScoped;
-
 /// Export one item to Kijiji.
 /// @author Origially by Google Gemini.
 ///
-@ApplicationScoped
 public class KijijiMarket implements Market<Item> {
 
     static String userHome = System.getProperty("user.home");

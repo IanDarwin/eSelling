@@ -37,6 +37,11 @@ public class Category {
         return name;
     }
 
+	// Convention:
+	public String getId() {
+		return name;
+	}
+
     public String name() {
         return name;
     }

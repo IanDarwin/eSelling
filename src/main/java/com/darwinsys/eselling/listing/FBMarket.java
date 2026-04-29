@@ -7,14 +7,9 @@ import java.util.List;
 import java.util.Set;
 
 import com.darwinsys.eselling.model.Item;
-import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 
-import static com.darwinsys.eselling.model.Condition.*;
-
-
-@ApplicationScoped
 public class FBMarket implements Market<Item> {
 
 	private final boolean chatterly = false;

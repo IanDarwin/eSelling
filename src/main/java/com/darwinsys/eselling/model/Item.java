@@ -2,7 +2,6 @@ package com.darwinsys.eselling.model;
 
 import com.darwinsys.eselling.listing.MarketName;
 import jakarta.persistence.*;
-import org.wildfly.common.annotation.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,15 +11,18 @@ public class Item {
 	@Id @GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id = 0L;
 
-	@NotNull
+	// @NotNull
 	private String name = "";
 
-	@NotNull
+	// @NotNull
 	@Column(length = 4096)
 	private String description = "";
 	private boolean active = true;
 	@Enumerated(EnumType.STRING)
 	private Condition condition;
+	@ElementCollection
+	@CollectionTable(name = "item_urls", joinColumns = @JoinColumn(name = "item_id"))
+	@Column(name = "url")
 	List<String> urls = new ArrayList<>();
 	private Double askingPrice = 0d;
 	@ManyToOne @JoinColumn(name = "category_id")
@@ -85,11 +87,12 @@ public class Item {
 
 	@Transient
 	public boolean isListed() {
-		for (String url : urls) {
-			if (url != null && !url.isEmpty()) {
-				return true;
-			}
-		}
+		// XXX FIXME for change in URL structure
+//		for (String url : urls) {
+//			if (url != null && !url.isEmpty()) {
+//				return true;
+//			}
+//		}
 		return false;
 	}
 	public void setListed(boolean useless) {
