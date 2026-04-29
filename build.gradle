@@ -32,15 +32,15 @@ dependencies {
 	implementation 'org.seleniumhq.selenium:selenium-java:4.43.0'
 	implementation 'io.github.bonigarcia:webdrivermanager:6.3.4'
 
-    // SLF4J for Hibernate logging
-    runtimeOnly 'org.slf4j:slf4j-simple:2.0.12'
-
 	// Apache POI for spreadsheet export
 	implementation 'org.apache.poi:poi:5.5.1'
+
+    // SLF4J for Hibernate logging
+    runtimeOnly 'org.slf4j:slf4j-simple:2.0.12'
 }
 
 application {
-    mainClass = 'com.darwinsys.eselling.admin.ItemAdminApp'
+    mainClass = 'com.darwinsys.eselling.admin.ESellingMain'
 }
 
 jar {
