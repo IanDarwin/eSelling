@@ -4,7 +4,12 @@ A Java desktop app for maintaining a list of items for sale, and exporting them 
 such as eBay, Kijiji, etc.
 
 The model code is from my previous human-coded eselling web app.
-Most of the Java code was, I regret to say, written by Claude.ai.
+Much of the Java code was written by Claude.ai.
+
+== HowTo Use
+
+In `src/main/resources/META-INF`, copy the sample file to `persistence.xml`, and modify
+it to suit. You'll need at least a permanent database (PostgreSQL recommended).
 
 == ToDo
 
