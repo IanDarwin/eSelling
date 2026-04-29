@@ -22,6 +22,7 @@ public class Item {
 	private Condition condition;
 	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "item_urls", joinColumns = @JoinColumn(name = "item_id"))
+	@Column(name="url")
 	List<String> urls = new ArrayList<>();
 	private Double askingPrice = 0d;
 	@ManyToOne @JoinColumn(name = "category_id")
