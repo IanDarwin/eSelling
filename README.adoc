@@ -5,3 +5,9 @@ such as eBay, Kijiji, etc.
 
 The model code is from my previous human-coded eselling web app.
 Most of the Java code was, I regret to say, written by Claude.ai.
+
+== ToDo
+
+Repair use of template method to reduce duplication in list() calls in Market.
+
+Repair UI for listing of markets in details panel. OR just move buttons to top of main.
