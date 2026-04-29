@@ -25,7 +25,7 @@ public class ItemService implements AutoCloseable {
     public List<Item> findAll() {
         EntityManager em = emf.createEntityManager();
         try {
-            return em.createQuery("SELECT i FROM Item i ORDER BY i.id", Item.class)
+            return em.createQuery("SELECT i FROM Item i ORDER BY i.name", Item.class)
                      .getResultList();
         } finally {
             em.close();
