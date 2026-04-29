@@ -3,7 +3,7 @@ package com.darwinsys.eselling.admin;
 import javax.swing.*;
 
 /**
- * Entry point for the Item Admin desktop application.
+ * Entry point for the E-Selling desktop application.
  */
 public class ItemAdminApp {
 
