@@ -1,11 +1,17 @@
 package com.darwinsys.eselling.admin;
 
+import com.darwinsys.eselling.listing.FBMarket;
+import com.darwinsys.eselling.listing.ListResponse;
+import com.darwinsys.eselling.listing.Market;
 import com.darwinsys.eselling.listing.MarketName;
 import com.darwinsys.eselling.model.Item;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.util.Set;
+
+import static javax.swing.JOptionPane.showMessageDialog;
 
 /**
  * Read-only panel showing full details of the selected Item.
@@ -23,8 +29,10 @@ public class ItemDetailPanel extends JPanel {
     private final JLabel photosDirLabel = new JLabel();
     private final JTextArea descArea    = new JTextArea(4, 40);
     private final JPanel urlsPanel      = new JPanel(new GridLayout(0, 2, 4, 2));
+    private final ItemAdminFrame parent;
 
-    public ItemDetailPanel() {
+    public ItemDetailPanel(ItemAdminFrame parent) {
+        this.parent = parent;
         setBorder(new TitledBorder("Item Detail"));
         setLayout(new BorderLayout(8, 8));
 
@@ -50,18 +58,48 @@ public class ItemDetailPanel extends JPanel {
         JScrollPane descScroll = new JScrollPane(descArea);
         descScroll.setBorder(BorderFactory.createTitledBorder("Description"));
 
+		// Actions panel
+		var listButtonsPanel = new JPanel();
+        listButtonsPanel.setBorder(BorderFactory.createTitledBorder("List"));
+        final JButton listOnAmazon = new JButton("Amazon");
+        listOnAmazon.addActionListener(e -> showMessageDialog(null, "Amazon not supported"));
+        listButtonsPanel.add(listOnAmazon);
+        final JButton listOnEBay = new JButton("eBay");
+        listButtonsPanel.add(listOnEBay);
+        final JButton listOnFB = new JButton("Fakebook");
+        listOnFB.addActionListener(e -> prepareAndList(new FBMarket()));
+        listButtonsPanel.add(listOnFB);
+        final JButton listOnKJ = new JButton("Kijiji");
+        listButtonsPanel.add(listOnKJ);
+
         // URLs panel
         urlsPanel.setBorder(BorderFactory.createTitledBorder("Market URLs"));
 
+		// Wrapper
+		var wrapper = new JPanel();
+		wrapper.add(listButtonsPanel);
+		wrapper.add(urlsPanel);
+
         JPanel bottom = new JPanel(new BorderLayout(4, 4));
         bottom.add(descScroll, BorderLayout.NORTH);
-        bottom.add(urlsPanel,  BorderLayout.CENTER);
+        bottom.add(wrapper,  BorderLayout.SOUTH);
 
         add(fields, BorderLayout.NORTH);
         add(bottom, BorderLayout.CENTER);
 
         clear();
     }
+
+    private String prepareAndList(Market<?> market) {
+        System.out.println("ItemDetailPanel.prepareAndList");
+        final Item selectedItem = parent.getSelectedItem();
+        if (selectedItem == null) {
+            showMessageDialog(null, "Select an item first");
+            return "";
+        }
+        return market.list(selectedItem).toString();
+    }
+
 
     public void display(Item item) {
         if (item == null) { clear(); return; }

@@ -4,7 +4,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import com.darwinsys.eselling.model.Item;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -70,6 +69,11 @@ public class FBMarket implements Market<Item> {
 	}
 
 	public ListResponse list(Item item) {
+		boolean closeAtEnd = false;
+		if (sheet == null) {
+			startStream(location);
+			closeAtEnd = true;
+		}
 
 		// Now a row from each Item:
 		int numMessages = 0;
@@ -117,6 +121,9 @@ public class FBMarket implements Market<Item> {
 
 		cell = row.createCell(4);
 		cell.setCellValue(item.getCategory().fbCategory());
+		if (closeAtEnd) {
+			closeStream();
+		}
 		return new ListResponse(location, 1, warnings);
 	}
 

@@ -20,9 +20,8 @@ public class Item {
 	private boolean active = true;
 	@Enumerated(EnumType.STRING)
 	private Condition condition;
-	@ElementCollection
+	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "item_urls", joinColumns = @JoinColumn(name = "item_id"))
-	@Column(name = "url")
 	List<String> urls = new ArrayList<>();
 	private Double askingPrice = 0d;
 	@ManyToOne @JoinColumn(name = "category_id")
@@ -87,13 +86,7 @@ public class Item {
 
 	@Transient
 	public boolean isListed() {
-		// XXX FIXME for change in URL structure
-//		for (String url : urls) {
-//			if (url != null && !url.isEmpty()) {
-//				return true;
-//			}
-//		}
-		return false;
+		return urls.size() > 0;
 	}
 	public void setListed(boolean useless) {
 		throw new UnsupportedOperationException("isListed is a derived value");

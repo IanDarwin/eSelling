@@ -4,6 +4,7 @@ import com.darwinsys.eselling.model.Category;
 import com.darwinsys.eselling.model.Item;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
@@ -30,7 +31,7 @@ public class ItemAdminFrame extends JFrame {
     private final CategoryService categoryService;
     private final ItemTableModel  tableModel = new ItemTableModel();
     private final JTable          table      = new JTable(tableModel);
-    private final ItemDetailPanel detailPanel = new ItemDetailPanel();
+    private final ItemDetailPanel detailPanel = new ItemDetailPanel(this);
     private final JLabel          statusBar   = new JLabel(" Ready");
 
     public ItemAdminFrame(ItemService itemService, CategoryService categoryService) {
@@ -105,9 +106,9 @@ public class ItemAdminFrame extends JFrame {
         bar.add(new JLabel("Search: "));
         JTextField searchField = new JTextField(15);
         searchField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
-            public void insertUpdate (javax.swing.event.DocumentEvent e) { applyFilter(searchField.getText()); }
-            public void removeUpdate (javax.swing.event.DocumentEvent e) { applyFilter(searchField.getText()); }
-            public void changedUpdate(javax.swing.event.DocumentEvent e) { applyFilter(searchField.getText()); }
+            public void insertUpdate (DocumentEvent e) { applyFilter(searchField.getText()); }
+            public void removeUpdate (DocumentEvent e) { applyFilter(searchField.getText()); }
+            public void changedUpdate(DocumentEvent e) { applyFilter(searchField.getText()); }
         });
         bar.add(searchField);
 
@@ -218,7 +219,7 @@ public class ItemAdminFrame extends JFrame {
         detailPanel.display(item);
     }
 
-    private Item getSelectedItem() {
+    Item getSelectedItem() {
         int viewRow = table.getSelectedRow();
         if (viewRow < 0) return null;
         int modelRow = table.convertRowIndexToModel(viewRow);

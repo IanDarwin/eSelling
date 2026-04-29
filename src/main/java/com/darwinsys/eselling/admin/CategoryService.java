@@ -7,8 +7,8 @@ import jakarta.persistence.Persistence;
 
 import java.util.List;
 
+/// ── Categories support ─────
 public class CategoryService {
-    // ── Categories ────────────────────────────────────────────────────────────
 
     private static final String PU = "eselling";
 
@@ -17,11 +17,16 @@ public class CategoryService {
     public CategoryService() {
         emf = Persistence.createEntityManagerFactory(PU);
         var em = emf.createEntityManager();
-        if (em.createQuery("FROM Category").getMaxResults() == 0) {
+        final List categories = em.createQuery("FROM Category").getResultList();
+        if (categories.size() == 0) {
             em.getTransaction().begin();
-            em.persist(new Category("TEST CAT", "FB CAT", 0, 0));
+            em.persist(new Category("TEST CAT", "TEST FB CAT", 123, 456));
             em.getTransaction().commit();
+            System.out.println("Created TEST CAT");
+        } else {
+            System.out.println("Found categories = " + categories);
         }
+        em.close();
     }
 
     public List<Category> findAllCategories() {

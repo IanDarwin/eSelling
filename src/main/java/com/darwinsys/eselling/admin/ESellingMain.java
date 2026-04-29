@@ -5,7 +5,7 @@ import javax.swing.*;
 /**
  * Entry point for the E-Selling desktop application.
  */
-public class ItemAdminApp {
+public class ESellingMain {
 
     public static void main(String[] args) {
         // Use system look-and-feel for a native feel
