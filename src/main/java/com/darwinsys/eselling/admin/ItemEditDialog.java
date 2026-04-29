@@ -187,10 +187,10 @@ public class ItemEditDialog extends JDialog {
         item.setTags(tagsField.getText().trim());
         item.setPhotosDir(photosDirField.getText().trim());
 
-        MarketName[] markets = MarketName.values();
-        for (int i = 0; i < markets.length && i < urlFields.length; i++) {
-            item.setUrl(markets[i], urlFields[i].getText().trim());
-        }
+//        MarketName[] markets = MarketName.values();
+//        for (int i = 0; i < markets.length && i < urlFields.length; i++) {
+//            item.setUrl(markets[i], urlFields[i].getText().trim());
+//        }
     }
 
     // ── GBC helpers ───────────────────────────────────────────────────────────

@@ -65,6 +65,11 @@ and complete the draft to make it active at
 
 	@Override
 	public ListResponse list(Item item) {
+		boolean closeAtEnd = false;
+		if (os == null) {
+			startStream(location);
+			closeAtEnd = true;
+		}
 		if (category == null) {
 			category = item.getCategory();
 		} else if (!category.equals(item.getCategory())) {
@@ -79,6 +84,10 @@ and complete the draft to make it active at
 				item.getDescription().replace('"', '\''));
 		System.out.println("DEBUG: " + output);
 		os.println(output);
+		if (closeAtEnd) {
+			os.close();
+			os = null;
+		}
 		return new ListResponse(location, 1, List.of());
 	}
 

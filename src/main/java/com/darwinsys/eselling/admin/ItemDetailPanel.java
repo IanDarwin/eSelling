@@ -1,9 +1,6 @@
 package com.darwinsys.eselling.admin;
 
-import com.darwinsys.eselling.listing.FBMarket;
-import com.darwinsys.eselling.listing.ListResponse;
-import com.darwinsys.eselling.listing.Market;
-import com.darwinsys.eselling.listing.MarketName;
+import com.darwinsys.eselling.listing.*;
 import com.darwinsys.eselling.model.Item;
 
 import javax.swing.*;
@@ -62,27 +59,30 @@ public class ItemDetailPanel extends JPanel {
 		var listButtonsPanel = new JPanel();
         listButtonsPanel.setBorder(BorderFactory.createTitledBorder("List"));
         final JButton listOnAmazon = new JButton("Amazon");
-        listOnAmazon.addActionListener(e -> showMessageDialog(null, "Amazon not supported"));
+        listOnAmazon.addActionListener(e -> showMessageDialog(parent, "Amazon not supported"));
         listButtonsPanel.add(listOnAmazon);
         final JButton listOnEBay = new JButton("eBay");
+        listOnEBay.addActionListener(e -> prepareAndList(new EBayMarket()));
         listButtonsPanel.add(listOnEBay);
         final JButton listOnFB = new JButton("Fakebook");
         listOnFB.addActionListener(e -> prepareAndList(new FBMarket()));
         listButtonsPanel.add(listOnFB);
         final JButton listOnKJ = new JButton("Kijiji");
+        listOnKJ.addActionListener(e -> prepareAndList(new KijijiMarket()));
         listButtonsPanel.add(listOnKJ);
 
         // URLs panel
         urlsPanel.setBorder(BorderFactory.createTitledBorder("Market URLs"));
+        urlsPanel.setMinimumSize(new Dimension(400, 400));
 
 		// Wrapper
-		var wrapper = new JPanel();
-		wrapper.add(listButtonsPanel);
-		wrapper.add(urlsPanel);
+		var wrapper = new JPanel(new BorderLayout(4,4));
+		wrapper.add(listButtonsPanel, BorderLayout.NORTH);
+		wrapper.add(urlsPanel, BorderLayout.SOUTH);
 
         JPanel bottom = new JPanel(new BorderLayout(4, 4));
         bottom.add(descScroll, BorderLayout.NORTH);
-        bottom.add(wrapper,  BorderLayout.SOUTH);
+        bottom.add(wrapper,  BorderLayout.CENTER);
 
         add(fields, BorderLayout.NORTH);
         add(bottom, BorderLayout.CENTER);
@@ -91,13 +91,16 @@ public class ItemDetailPanel extends JPanel {
     }
 
     private String prepareAndList(Market<?> market) {
-        System.out.println("ItemDetailPanel.prepareAndList");
+        System.out.println("ItemDetailPanel.prepareAndList on " + market);
         final Item selectedItem = parent.getSelectedItem();
         if (selectedItem == null) {
-            showMessageDialog(null, "Select an item first");
+            showMessageDialog(parent, "Select an item first");
             return "";
         }
-        return market.list(selectedItem).toString();
+        market.list(selectedItem);
+        final String postMessage = market.getPostMessage();
+        JOptionPane.showMessageDialog(parent, postMessage);
+        return postMessage;
     }
 
 
