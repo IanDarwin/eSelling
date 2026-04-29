@@ -20,7 +20,7 @@ import java.util.List;
  *   │  Toolbar: [New] [Edit] [Delete] [Refresh]   │
  *   ├──────────────────┬──────────────────────────┤
  *   │  Item list table │  Item detail panel        │
- *   │  (top 60%)       │  (right side)             │
+ *   │  (top 50%)       │  (right side)             │
  *   └──────────────────┴──────────────────────────┘
  *   │  Status bar                                  │
  *   └─────────────────────────────────────────────┘
@@ -74,9 +74,9 @@ public class ItemAdminFrame extends JFrame {
         table.getColumnModel().getColumn(0).setPreferredWidth(50);
         table.getColumnModel().getColumn(1).setPreferredWidth(200);
         table.getColumnModel().getColumn(2).setPreferredWidth(100);
-        table.getColumnModel().getColumn(3).setPreferredWidth(80);
-        table.getColumnModel().getColumn(4).setPreferredWidth(40);
-        table.getColumnModel().getColumn(5).setPreferredWidth(120);
+        table.getColumnModel().getColumn(3).setPreferredWidth(40);
+        table.getColumnModel().getColumn(4).setPreferredWidth(30);
+        table.getColumnModel().getColumn(5).setPreferredWidth(100);
         table.getColumnModel().getColumn(6).setPreferredWidth(50);
         table.getColumnModel().getColumn(7).setPreferredWidth(50);
     }

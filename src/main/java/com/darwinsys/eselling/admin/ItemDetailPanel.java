@@ -24,9 +24,9 @@ public class ItemDetailPanel extends JPanel {
     private final JLabel activeLabel    = new JLabel();
     private final JLabel tagsLabel      = new JLabel();
     private final JLabel photosDirLabel = new JLabel();
-    private final JTextArea descArea    = new JTextArea(4, 40);
-    private final JPanel urlsPanel      = new JPanel(new GridLayout(0, 2, 4, 2));
+    private final JTextArea descArea    = new JTextArea(6, 40);
     private final ItemAdminFrame parent;
+    private final JPanel urlsPanel      = new JPanel(new GridBagLayout());
 
     public ItemDetailPanel(ItemAdminFrame parent) {
         this.parent = parent;
@@ -73,7 +73,6 @@ public class ItemDetailPanel extends JPanel {
 
         // URLs panel
         urlsPanel.setBorder(BorderFactory.createTitledBorder("Market URLs"));
-        urlsPanel.setMinimumSize(new Dimension(400, 400));
 
 		// Wrapper
 		var wrapper = new JPanel(new BorderLayout(4,4));
@@ -120,13 +119,18 @@ public class ItemDetailPanel extends JPanel {
         descArea      .setCaretPosition(0);
 
         urlsPanel.removeAll();
+        int row = 0;
+        GridBagConstraints lc = labelConstraints();
+        GridBagConstraints vc = valueConstraints();
         for (MarketName market : MarketName.values()) {
             String url = "";
             try { url = item.getUrl(market); } catch (Exception ignored) {}
-            urlsPanel.add(new JLabel(market.name() + ":"));
-            JLabel urlLabel = new JLabel(url.isEmpty() ? "(not listed)" : url);
-            urlLabel.setForeground(url.isEmpty() ? Color.GRAY : Color.BLUE.darker());
-            urlsPanel.add(urlLabel);
+
+            addRow(urlsPanel, row++, lc, vc, market.name(),  new JTextField(url.isEmpty() ? "(not listed)" : url));
+            //urlsPanel.add(new JLabel(market.name() + ":"));
+            //JLabel urlLabel = new JLabel(url.isEmpty() ? "(not listed)" : url);
+            //urlLabel.setForeground(url.isEmpty() ? Color.GRAY : Color.BLUE.darker());
+            //urlsPanel.add(urlLabel);
         }
         urlsPanel.revalidate();
         urlsPanel.repaint();
