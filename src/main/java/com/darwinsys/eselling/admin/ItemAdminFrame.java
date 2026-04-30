@@ -13,7 +13,7 @@ import java.awt.event.WindowEvent;
 import java.util.List;
 
 /**
- * Main frame for the Item Admin application.
+ * Main frame for the ESelling Admin application.
  *
  * Layout:
  *   ┌─────────────────────────────────────────────┐
@@ -35,7 +35,7 @@ public class ItemAdminFrame extends JFrame {
     private final JLabel          statusBar   = new JLabel(" Ready");
 
     public ItemAdminFrame(ItemService itemService, CategoryService categoryService) {
-        super("Item Admin");
+        super("ESelling Admin");
         this.itemService = itemService;
         this.categoryService = categoryService;
 

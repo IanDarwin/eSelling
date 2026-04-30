@@ -18,6 +18,13 @@ it to suit.
 
 Once that's in place you might be able to run it with `gradle run`
 
+To package it, 'gradle jar' which will create build/libs/eselling-admin-?.?-SNAPSHOT.jar
+
+For safekeeping, you should copy that file to someplace more generic, like `~/lib`
+
+You can then run `java -jar ~/lib/eselling*.jar` to try it out.
+Assuming it works, create a one-line shell script, shell alias or `.bat` file to run it.
+
 == ToDo
 
 Repair use of template method to reduce duplication in list() calls in Market.
