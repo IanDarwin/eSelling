@@ -2,9 +2,13 @@
 
 A Java desktop app for maintaining a list of items for sale, and exporting them to various markets
 such as eBay, Kijiji, etc.
+The eBay and FB markets output a file that can be uploaded via the web.
+Kijiji refuses to provide an API or even an upload, so we try to
+insert the item using Selenium Web Driver.
 
-The model code is from my previous human-coded eselling web app.
-Much of the Java code was written by Claude.ai.
+The model code and the per-market export code is from my previous human-coded eselling web app.
+The Swing UI was written by Claude AI and heavily modified afterwards.
+The WebDriver code was written by one of the common AIs, I forget which.
 
 == HowTo Use
 
