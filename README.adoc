@@ -16,7 +16,7 @@ You'll need at least a permanent database (PostgreSQL recommended). To hook that
 In `src/main/resources/META-INF`, copy the sample file to `persistence.xml`, and modify
 it to suit.
 
-Once that's in place you might be able to run it with `gradle run`.
+Once that's in place you might be able to run it with `gradle run`
 
 == ToDo
 
