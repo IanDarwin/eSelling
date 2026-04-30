@@ -37,8 +37,9 @@ dependencies {
 	// Apache POI for spreadsheet export
 	implementation 'org.apache.poi:poi:5.5.1'
 
-    // SLF4J for Hibernate logging
+    // Why not have every project use a different logger?
     runtimeOnly 'org.slf4j:slf4j-simple:2.0.12'
+    runtimeOnly 'org.apache.logging.log4j:log4j-jul:3.0.0-beta3'
 }
 
 application {
