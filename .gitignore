@@ -12,3 +12,4 @@ categories.csv
 # Browser drivers for selenium webdriver
 drivers/
 gradle
+.idea
