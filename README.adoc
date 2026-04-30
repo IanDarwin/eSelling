@@ -12,18 +12,50 @@ The WebDriver code was written by one of the common AIs, I forget which.
 
 == HowTo Use
 
-You'll need at least a permanent database (PostgreSQL recommended). To hook that up,
-In `src/main/resources/META-INF`, copy the sample file to `persistence.xml`, and modify
-it to suit.
+You need to build it yourself, so it can get the database parameters from a text file.
+Details on getting what you need beforehand, and building, are in the following sections.
 
-Once that's in place you might be able to run it with `gradle run`
+=== Pre-requisites
 
-To package it, 'gradle jar' which will create build/libs/eselling-admin-?.?-SNAPSHOT.jar
+The program, and the build tool, are both written in Java, so you will need a Java "JDK"
+(Java Development Kit, officially called the "Java SDK (Software Development Kit)".
+You can find Java downloads all over the interwebs, but make sure you're installingf
+from a reputable source, and a current Java version. As of this writing, 21 or 25.
+If somebody tells you to install JDK 1.8 or Java 11, just block them.
+
+The build is done with the `gradle` build tool (see https://gradle.org[]).
+Now maybe I'm a "gradle heretic" but - because the version
+changes so frequently - I don't embed a copy of Gradle into every project 
+(except Flutter/Android where it's forced upon you).
+Rather, I use a single standard system-wide install, provided by most operating system's package managers.
+If that doesn't work for you, you'll have to install Gradle manually into the project.
+You can try unzipping `add-gradle.zip`, though the version it starts with
+is likely to be out of date by the time you read this.
+Note also that because Gradle creates a directory called `gradle` in each project,
+Gradle's maintainers realized too late that they couldn't also have a command called `gradle` in the project,
+so they use `gradlew` (or `gradlew.bat` on MS-Windows.
+*If you're using the per-project Gradle, you'll have to type that instead of `gradle`* in the following steps.
+
+If you plan to keep your listings data longer than a few days,
+you'll probably want a permanent database.
+I highly recommend the open-source Postgres (https://postgresql.org[]) for its stability, standards compliance, etc.
+To hook up your database, in `src/main/resources/META-INF`, copy the sample file to `persistence.xml`, and modify
+it to suit. If you're on Unix or its clone Linux, this might work:
+
+	cd src/main/resources/META-INF
+	cp persistence.xml.sample persistence.xml
+	vi persistence.xml # replace the database parameters
+
+=== Running
+
+Once all that's in place you might be able to run it with `gradle run` (or `gradle build run`).
+
+To package it, 'gradle jar' which will create the runnable JAR `build/libs/eselling-admin-?.?-SNAPSHOT.jar`
 
 For safekeeping, you should copy that file to someplace more generic, like `~/lib`
 
-You can then run `java -jar ~/lib/eselling*.jar` to try it out.
-Assuming it works, create a one-line shell script, shell alias or `.bat` file to run it.
+You can then use `java -jar ~/lib/eselling*.jar` to try it out.
+Assuming this works, create a one-line shell script, shell alias or `.bat` file to run it.
 
 == ToDo
 
