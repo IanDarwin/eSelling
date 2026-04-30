@@ -12,11 +12,12 @@ The WebDriver code was written by one of the common AIs, I forget which.
 
 == HowTo Use
 
+You'll need at least a permanent database (PostgreSQL recommended). To hook that up,
 In `src/main/resources/META-INF`, copy the sample file to `persistence.xml`, and modify
-it to suit. You'll need at least a permanent database (PostgreSQL recommended).
+it to suit.
+
+Once that's in place you might be able to run it with `gradle run`.
 
 == ToDo
 
 Repair use of template method to reduce duplication in list() calls in Market.
-
-Repair UI for listing of markets in details panel. OR just move buttons to top of main.
